@@ -65,7 +65,7 @@ function Sidebar() {
             {isProfileMenuOpen && (
               <div className="absolute right-0 top-full mt-3 w-60 bg-[#1a0b36]/95 backdrop-blur-xl border border-purple-500/40 rounded-2xl shadow-[0_10px_30px_rgba(168,85,247,0.3)] z-50 overflow-hidden transform origin-top-right scale-100 transition-all">
                 
-                {/* Cabecera del menú (Datos simulados)}
+                {/* Cabecera del menú (Datos simulados)*/}
                 <div className="p-4 border-b border-purple-500/20 bg-[#15092a]/50 flex items-center gap-3">
                   <div className="w-12 h-12 shrink-0 rounded-full border border-fuchsia-400/50 bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center font-bold text-white text-lg">
                     GV
