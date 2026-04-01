@@ -7,23 +7,33 @@ import Sidebar from './components/Sidebar.jsx';
 import Assistant from './components/Assistant.jsx';
 import Favoritos from './pages/Favoritos.jsx';
 import Configuracion from './pages/Configuracion.jsx';
+import Header from './components/Header.jsx';
+import Footer from './components/Footer.jsx';
 
 const MapaTemp = () => <div className="min-h-screen bg-[#05010a] text-white p-24 text-2xl font-bold"> Mapa Satelital (En Construcción) </div>
 
 function DashboardLayout() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
-    <div className="flex min-h-screen bg-[#05010a]">
-      <Sidebar />
+    <div className="flex min-h-screen bg-[#05010a] overflow-x-hidden">
+      <Header onMenuClick={() => setIsMenuOpen (true)} />
+
+      <Sidebar isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       
-      <div className="flex-1 ml-0 md:ml-64 overflow-x-hidden transition-all duration-300">
+      <div className="flex-1 ml-0 md:ml-64 overflow-x-hidden transition-all duration-300 md:ml-64 pt-16 md:pt-0">
+        <main className="flex-1">
         <Outlet />
+        </main>
+
+        <Footer />
       </div>
       <Assistant />
     </div>
-  )
+  );
 }
 
 function App() {
+
   return (
     <BrowserRouter>
       <Routes>
