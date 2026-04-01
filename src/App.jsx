@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {BrowserRouter, Routes, Route, Outlet} from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
@@ -20,7 +21,7 @@ function DashboardLayout() {
 
       <Sidebar isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       
-      <div className="flex-1 ml-0 md:ml-64 overflow-x-hidden transition-all duration-300 md:ml-64 pt-16 md:pt-0">
+      <div className="flex-1 flex flex-col min-h-screen transition-all duration-300 md:ml-64 pt-16 md:pt-0">
         <main className="flex-1">
         <Outlet />
         </main>

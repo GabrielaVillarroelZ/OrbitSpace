@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Login from "./Login";
 import Logo from "./OrbitSpace-Logo.svg";
 import { Rocket, Shield, Globe, X, Satellite, Sparkles, Play } from "lucide-react";
+import Footer from "../components/Footer.jsx";
 function Home() {
     const [mostrarLogin, setMostrarLogin] = useState(false);
     const scrollToDemo = () => {
@@ -120,6 +121,7 @@ function Home() {
             {mostrarLogin && (
                 <Login onClose={() => setMostrarLogin(false)} />
             )}
+            <Footer />
         </div>
     );
 }
