@@ -91,7 +91,7 @@ function Sidebar({ isOpen, onClose }) {
                       <Settings size={16} className="text-purple-400" /> <span>Ajustes</span>
                     </button>
                     <div className="border-t border-purple-500/20 my-2"></div>
-                    <Link to="/" className="flex items-center gap-3 px-3 py-2 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors">
+                    <Link to="/" onClick={onClose} className="flex items-center gap-3 px-3 py-2 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors">
                       <LogOut size={16} /> <span className="font-medium">Cerrar Sesión</span>
                     </Link>
                   </nav>
@@ -106,6 +106,7 @@ function Sidebar({ isOpen, onClose }) {
             <Link to="/lanzamientos" className={linkClasses("/lanzamientos")}><Rocket size={18} className={iconColor("/lanzamientos")} /> <span className="font-medium">Lanzamientos</span></Link>
             <Link to="/favoritos" className={linkClasses("/favoritos")}><Star size={18} className={iconColor("/favoritos")} /> <span className="font-medium">Mis Favoritos</span></Link>
             <Link to="/configuracion" className={linkClasses("/configuracion")}><Settings size={18} className={iconColor("/configuracion")} /> <span className="font-medium">Configuración</span></Link>
+            <Link to="/" onClick={onClose} className={linkClasses("/")}><LogOut size={18} className={iconColor("/")} /> <span className="font-medium">Cerrar Sesión</span></Link>
           </nav>
         </div>
 

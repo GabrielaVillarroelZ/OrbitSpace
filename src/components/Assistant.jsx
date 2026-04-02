@@ -3,18 +3,14 @@ import { Star, X, Send } from "lucide-react";
 
 function Assistant() {
   const [isOpen, setIsOpen] = useState(false);
-  
-  
   const [inputValue, setInputValue] = useState("");
 
-  // Estado para la lista de mensajes ( maqueta)
   const [messages, setMessages] = useState([
     { id: 1, type: 'ai', text: 'Hola, Comandante. Soy su asistente orbital. ¿En qué puedo ayudarla con la red de satélites hoy?' },
     { id: 2, type: 'user', text: 'Muéstrame el estado de salud del satélite Sentinel-3B.' },
     { id: 3, type: 'ai', text: 'Analizando telemetría... El Sentinel-3B reporta estado NOMINAL. Baterías al 94%, temperatura estable y órbita corregida. ¿Desea ver el gráfico de potencia?' }
   ]);
 
-  //Truco para que el chat haga scroll hacia abajo automáticamente
   const messagesEndRef = useRef(null);
   useEffect(() => {
     if (isOpen) {
@@ -22,17 +18,14 @@ function Assistant() {
     }
   }, [messages, isOpen]);
 
-  //  Función que se ejecuta al darle a "Enviar"
   const handleSendMessage = (e) => {
-    e.preventDefault(); // Evita que la página se recargue al darle al Enter
+    e.preventDefault(); 
     if (!inputValue.trim()) return;
 
-    // Añadimos el mensaje del usuario a la lista
     const newUserMsg = { id: Date.now(), type: 'user', text: inputValue };
     setMessages((prev) => [...prev, newUserMsg]);
     setInputValue(""); 
 
-    // Simulamos que la IA "piensa" y responde al cabo de 1 segundo
     setTimeout(() => {
       const aiResponse = { 
         id: Date.now() + 1, 
@@ -45,19 +38,17 @@ function Assistant() {
 
   return (
     <>
-      
       {isOpen && (
-        <div className="fixed bottom-28 right-8 w-96 h-[500px] bg-[#1a0b36]/95 backdrop-blur-2xl border border-purple-500/40 rounded-3xl shadow-[0_0_40px_rgba(168,85,247,0.3)] z-40 flex flex-col overflow-hidden transition-all duration-300">
+        <div className="fixed bottom-20 md:bottom-28 right-4 left-4 md:left-auto md:right-8 md:w-96 h-[70vh] md:h-[500px] bg-[#1a0b36]/95 backdrop-blur-2xl border border-purple-500/40 rounded-3xl shadow-[0_0_40px_rgba(168,85,247,0.3)] z-50 flex flex-col overflow-hidden transition-all duration-300">
           
-         
-          <div className="p-4 border-b border-purple-500/20 flex items-center justify-between bg-gradient-to-r from-[#15092a] to-[#1e0a3c]">
+          <div className="p-3 md:p-4 border-b border-purple-500/20 flex items-center justify-between bg-gradient-to-r from-[#15092a] to-[#1e0a3c]">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-purple-600/30 border border-purple-400/50 shadow-[0_0_15px_rgba(168,85,247,0.6)]">
                 <Star size={16} className="text-white fill-fuchsia-100" />
               </div>
               <div>
-                <h3 className="text-md font-bold text-white leading-tight">Orbit <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">Assistant</span></h3>
-                <p className="text-xs text-purple-300/70">IA Orbital en línea</p>
+                <h3 className="text-sm md:text-md font-bold text-white leading-tight">Orbit <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">Assistant</span></h3>
+                <p className="text-[10px] md:text-xs text-purple-300/70">IA Orbital en línea</p>
               </div>
             </div>
             <button 
@@ -68,15 +59,10 @@ function Assistant() {
             </button>
           </div>
 
-          {/* CUERPO DEL CHAT (MENSAJES DINÁMICOS) */}
-          <div className="flex-1 p-5 space-y-6 overflow-y-auto text-sm flex flex-col scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-transparent">
-            
-            {/* Aquí es donde la magia ocurre: Pintamos la lista de mensajes automáticamente */}
+          <div className="flex-1 p-4 md:p-5 space-y-6 overflow-y-auto text-sm flex flex-col scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-transparent">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex w-full ${msg.type === 'user' ? 'justify-end' : ''}`}>
-                <div className={`flex gap-3 max-w-[85%] ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
-                  
-                 
+                <div className={`flex gap-3 max-w-[90%] md:max-w-[85%] ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
                   <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center border shadow-md ${
                     msg.type === 'user' 
                       ? 'bg-[#15092a] border-fuchsia-400/50 text-xs font-bold text-fuchsia-300' 
@@ -84,9 +70,7 @@ function Assistant() {
                   }`}>
                     {msg.type === 'user' ? 'TÚ' : <Star size={14} className="text-white fill-white" />}
                   </div>
-
-                 
-                  <div className={`p-3.5 rounded-2xl leading-relaxed shadow-sm ${
+                  <div className={`p-3 text-[13px] md:text-sm rounded-2xl leading-relaxed shadow-sm ${
                     msg.type === 'user'
                       ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(168,85,247,0.2)]'
                       : 'bg-[#2a1457] text-purple-50 rounded-tl-none border border-purple-500/30'
@@ -96,23 +80,21 @@ function Assistant() {
                 </div>
               </div>
             ))}
-            
             <div ref={messagesEndRef} />
           </div>
 
-          {/* INPUT DE TEXTO (AQUÍ ENVOLVEMOS EN UN FORM PARA USAR EL ENTER) */}
-          <form onSubmit={handleSendMessage} className="p-4 border-t border-purple-500/20 bg-[#15092a]/80">
-            <div className="flex items-center gap-2 bg-[#2a1457]/50 border border-purple-500/30 rounded-full p-1.5 pr-2 focus-within:border-fuchsia-400/80 focus-within:ring-1 focus-within:ring-fuchsia-400/30 transition-all shadow-inner">
+          <form onSubmit={handleSendMessage} className="p-3 md:p-4 border-t border-purple-500/20 bg-[#15092a]/80">
+            <div className="flex items-center gap-2 bg-[#2a1457]/50 border border-purple-500/30 rounded-full p-1 md:p-1.5 pr-2 focus-within:border-fuchsia-400/80 focus-within:ring-1 focus-within:ring-fuchsia-400/30 transition-all shadow-inner">
               <input 
                 type="text" 
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)} // Guardamos lo que escribes en tiempo real
+                onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Escribe tu mensaje..." 
-                className="flex-1 bg-transparent px-4 text-purple-100 placeholder:text-purple-300/50 outline-none text-sm"
+                className="flex-1 bg-transparent px-3 md:px-4 text-purple-100 placeholder:text-purple-300/50 outline-none text-[13px] md:text-sm"
               />
               <button 
                 type="submit"
-                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-2 rounded-full hover:scale-105 transition-all shadow-[0_0_10px_rgba(168,85,247,0.4)]"
+                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-1.5 md:p-2 rounded-full hover:scale-105 transition-all shadow-[0_0_10px_rgba(168,85,247,0.4)]"
               >
                 <Send size={16} />
               </button>
@@ -121,14 +103,13 @@ function Assistant() {
         </div>
       )}
 
-      
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-8 right-8 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-4 rounded-full shadow-[0_0_15px_rgba(168,85,247,0.6)] hover:shadow-[0_0_30px_rgba(217,70,239,1)] hover:scale-110 transition-all duration-300 z-50 group border border-fuchsia-400/50 flex items-center justify-center"
+        className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-3 md:p-4 rounded-full shadow-[0_0_15px_rgba(168,85,247,0.6)] hover:shadow-[0_0_30px_rgba(217,70,239,1)] hover:scale-110 transition-all duration-300 z-50 group border border-fuchsia-400/50 flex items-center justify-center"
       >
         <Star 
-          size={30} 
-          className="text-white group-hover:fill-white group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,1)] transition-all duration-300" 
+          size={24} 
+          className="text-white md:w-[30px] md:h-[30px] group-hover:fill-white group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,1)] transition-all duration-300" 
         />
       </button>
     </>
