@@ -16,22 +16,18 @@ function Home() {
             <div className="absolute top-[-15%] left-[-10%] w-[500px] bg-purple-900/20 rounded-full blur-[120px] pointer-events-none"></div>
             <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-fuchsia-900/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-            <nav className="w-full p-6 flex justify-between items-center z-10">
-                <img src={Logo} alt="OrbitSpace Logo" className="w-48 h-auto object-contain drop-shadow-[0_0_15px_rgba(168,85,246,0.5)]" />
-
-                <button 
-                onClick={() => setMostrarLogin(true)}
-                className="text-purple-300 hover:text-white font-medium transition-colors px-4 py-2"
-                >
-                    Iniciar Sesión
-                </button>
+            <nav className="w-full p-4 md:p-8 flex justify-center items-center z-10">
+                <img src={Logo} alt="OrbitSpace Logo" 
+                className="w-[200px] md:w-[350px] min-w-[200px] md:min-w-[350px] h-auto object-contain drop-shadow-[0_0_15px_rgba(168,85,246,0.5)]" />
             </nav>
 
-            <main className="flex flex-col items-center justify-center text-center px-4 pt-16 pb-24 z-10 relative">
-                <span className="mb-6 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 text-sm font medium tracking-wide shadow-[0_0_15px_rgba(168,85,247,0.15)]"
-                >
-                    Bienvenido a OrbitSpace
-                </span>
+            <main className="flex flex-col items-center justify-center text-center px-4 pt-4 md:pt-6 pb-24 z-10 relative">
+                <div className="mb-6 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-fuchsia-400/50 bg-[#1a0b36]/90 backdrop-blur-md shadow-[0_0_25px_rgba(217,70,239,0.25)] hover:border-fuchsia-300 transition-colors cursor-default">
+                    <Sparkles size={18} className="text-fuchsia-300 animate-pulse" />
+                    <span className="text-fuchsia-100 text-[13px] md:text-sm font-bold tracking-[0.2em] uppercase">
+                        Bienvenidos a OrbitSpace
+                    </span>
+                </div>
 
                 <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight max-w-4xl">
                     Explora el <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-fuchsia-500">Universo</span> en Tiempo Real
@@ -51,7 +47,7 @@ function Home() {
 
                 <button
                 onClick={scrollToDemo}
-                className="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-purple-500/50 hover:bg-purple-900/30 hover:border-purple_400 text-white rounded-full font-bold text-lg transition-all"
+                className="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-purple-500/50 hover:bg-purple-900/30 hover:border-purple-400 text-white rounded-full font-bold text-lg transition-all"
                 >
                     Ver Demo
                 </button>
