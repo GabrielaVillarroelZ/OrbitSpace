@@ -11,6 +11,7 @@ import Configuracion from './pages/Configuracion.jsx';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import Mapa from './pages/Mapa.jsx';
+import Perfil from './pages/Perfil.jsx';
 
 const MapaTemp = () => <div className="min-h-screen bg-[#05010a] text-white p-24 text-2xl font-bold"> Mapa Satelital (En Construcción) </div>
 
@@ -47,6 +48,7 @@ function App() {
           <Route path="/mapa" element={<Mapa />} />
           <Route path="/favoritos" element={<Favoritos />} />
           <Route path="/configuracion" element={<Configuracion />} />
+          <Route path="/perfil" element={<Perfil />} />
           
         </Route>
       </Routes>
