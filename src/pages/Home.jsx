@@ -22,7 +22,7 @@ function Home() {
             </nav>
 
             <main className="flex flex-col items-center justify-center text-center px-4 pt-4 md:pt-6 pb-24 z-10 relative">
-                <div className="mb-6 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-fuchsia-400/50 bg-[#1a0b36]/90 backdrop-blur-md shadow-[0_0_25px_rgba(217,70,239,0.25)] hover:border-fuchsia-300 transition-colors cursor-default">
+                <div className="-mt-8 md:-mt-12 mb-6 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-fuchsia-400/50 bg-[#1a0b36]/90 backdrop-blur-md shadow-[0_0_25px_rgba(217,70,239,0.25)] hover:border-fuchsia-300 transition-colors cursor-default">
                     <Sparkles size={18} className="text-fuchsia-300 animate-pulse" />
                     <span className="text-fuchsia-100 text-[13px] md:text-sm font-bold tracking-[0.2em] uppercase">
                         Bienvenidos a OrbitSpace
