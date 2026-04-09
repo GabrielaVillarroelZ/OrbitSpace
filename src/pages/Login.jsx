@@ -7,7 +7,6 @@ function Login({ onClose }) {
     const [vista, setVista] = useState("Login");
     const navigate = useNavigate();
     
-    
     const [formData, setFormData] = useState({
         nombre: '',
         email: '',
@@ -15,10 +14,8 @@ function Login({ onClose }) {
         confirmPassword: ''
     });
 
-    
     const [errores, setErrores] = useState({});
 
-    
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         if (errores[e.target.name]) {
@@ -26,12 +23,10 @@ function Login({ onClose }) {
         }
     };
 
-   
     const handleSubmit = (e) => {
         e.preventDefault();
         const nuevosErrores = {};
 
-      
         if (vista === "registro" && !formData.nombre.trim()) {
             nuevosErrores.nombre = "El nombre es obligatorio.";
         }
@@ -41,24 +36,33 @@ function Login({ onClose }) {
         if (vista !== "recuperar" && formData.password.length < 6) {
             nuevosErrores.password = "La contraseña debe tener 6+ caracteres.";
         }
-
         if (vista === "registro" && formData.password !== formData.confirmPassword) {
             nuevosErrores.confirmPassword = "Las contraseñas no coinciden.";
         }
 
-       
         if (Object.keys(nuevosErrores).length > 0) {
             setErrores(nuevosErrores);
             return;
         }
 
-       
-        console.log("Datos válidos:", formData);
-        onClose(); 
-        navigate("/dashboard"); 
+        if (vista === "Login") {
+            if (formData.email === "admin@orbitspace.com" && formData.password === "123456") {
+                localStorage.setItem('orbitspace_auth', 'true');
+                if (onClose) onClose();
+                navigate("/dashboard");
+            } else {
+                setErrores({ email: "Credenciales incorrectas" });
+                /*(Usa admin@orbitspace.com / 123456)*/
+            }
+        } else if (vista === "registro") {
+            localStorage.setItem('orbitspace_auth', 'true');
+            if (onClose) onClose();
+            navigate("/dashboard");
+        } else if (vista === "recuperar") {
+            cambiarVista("Login");
+        }
     };
 
-    
     const cambiarVista = (nuevaVista) => {
         setVista(nuevaVista);
         setErrores({});
@@ -180,7 +184,7 @@ function Login({ onClose }) {
                         <p className="text-sm text-purple-200/80 text-center mb-6">
                             Ingresa tu correo y te enviaremos instrucciones.
                         </p>
-                        <form onSubmit={(e) => { e.preventDefault();  }} className="space-y-4">
+                        <form onSubmit={(e) => { e.preventDefault(); cambiarVista("Login"); }} className="space-y-4">
                             <input 
                                 type="email" placeholder="Correo electrónico" 
                                 className="w-full bg-[#2a1758]/50 border border-purple-500/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition-all placeholder-purple-300/50" 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Star, Satellite, Orbit, Activity, Map, Eye } from "lucide-react";
+import { Link } from 'react-router-dom';
 
 const GlobalStyles = () => (
   <style>{`
@@ -91,10 +92,10 @@ function Favoritos() {
               Acceso rápido a la telemetría de tus activos orbitales y constelaciones prioritarias.
             </p>
           </div>
-          <button className="px-6 py-3 bg-purple-500/10 border border-purple-500/30 hover:border-fuchsia-400/50 hover:bg-fuchsia-500/10 rounded-xl transition-all font-medium text-purple-200 hover:text-white flex items-center gap-2">
-            <Map size={18} />
-            Ver en Mapa Satelital
-          </button>
+          <Link to="/mapa" className="px-6 py-3 bg-purple-500/10 border border-purple-500/30 hover:border-fuchsia-400/50 hover:bg-fuchsia-500/10 rounded-xl transition-all font-medium text-purple-200 hover:text-white flex items-center gap-2">
+                <Map size={16} />
+           Ver en Mapa Satelital
+          </Link>
         </div>
 
      

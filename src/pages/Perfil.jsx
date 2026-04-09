@@ -1,4 +1,5 @@
 import { User, Mail, Shield, Key, Camera, Activity, Heart, LogOut } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 function Perfil() {
     // Datos simulados del usuario (luego vendrán de la base de datos)
@@ -66,10 +67,10 @@ function Perfil() {
                     </div>
 
                     {/* Botón de Cerrar Sesión */}
-                    <button className="w-full py-3 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-2xl flex items-center justify-center gap-2 transition-colors font-medium">
+                    <Link to="/" className="w-full py-3 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-2xl flex items-center justify-center gap-2 transition-colors font-medium">
                         <LogOut size={18} />
                         Desconectar Sistema
-                    </button>
+                    </Link>
                 </div>
 
                 {/* COLUMNA DERECHA: Estadísticas y Ajustes */}

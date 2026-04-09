@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import LoaderOrbital from '../components/LoaderOrbital';
 import { Satellite, Rocket, Activity, CheckCircle2, AlertTriangle, Wifi, Search, MapPin } from 'lucide-react';
 
 const GlobalStyles = () => (
@@ -17,14 +18,33 @@ const GlobalStyles = () => (
     .animate-pulse-star {
       animation: pulse-star 3s ease-in-out infinite;
     }
+    .animate-fade-in {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   `}</style>
 );
 
 function Dashboard() {
+  const [cargando, setCargando] = useState(true);
   const starsArray = Array.from({ length: 40 });
 
+  useEffect(() => {
+    const temporizador = setTimeout(() => {
+      setCargando(false);
+    }, 2000);
+    return () => clearTimeout(temporizador);
+  }, []);
+
+  if (cargando) {
+    return <LoaderOrbital mensaje="Sincronizando red de satélites..." />;
+  }
+
   return (
-    <div className="min-h-screen p-4 md:p-8 text-white relative overflow-hidden bg-[#05010a]">
+    <div className="min-h-screen p-4 md:p-8 text-white relative overflow-hidden bg-[#05010a] animate-fade-in">
       <GlobalStyles /> 
 
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -117,13 +137,15 @@ function Dashboard() {
               ].map(sat => (
                 <div key={sat.name} className="flex items-center justify-between p-3 bg-purple-500/10 rounded-xl border border-purple-500/20 hover:border-fuchsia-400/50 transition-all cursor-pointer">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full bg-${sat.color}-400 ${sat.color === 'green' ? 'animate-pulse' : ''}`}></div>
+                    <div className={`w-2 h-2 rounded-full ${sat.color === 'green' ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`}></div>
                     <div>
                       <p className="text-xs font-bold text-white leading-tight">{sat.name}</p>
                       <p className="text-[10px] text-purple-300/70">{sat.orbit}</p>
                     </div>
                   </div>
-                  <span className={`text-[10px] bg-${sat.color}-500/20 text-${sat.color}-400 px-2 py-0.5 rounded`}>{sat.state}</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded ${sat.color === 'green' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                    {sat.state}
+                  </span>
                 </div>
               ))}
             </div>
@@ -137,28 +159,21 @@ function Dashboard() {
           </h3>
           
           <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border border-purple-500/40 relative bg-[#0a0515] p-2 flex items-center justify-center shadow-inner">
-            
             {[1, 2, 3].map(ring => (
               <div key={ring} className={`absolute border border-purple-500/20 rounded-full`} style={{ width: `${ring * 33}%`, height: `${ring * 33}%` }} />
             ))}
-            
             <div className="absolute top-1/2 left-0 w-full h-[1px] bg-purple-500/20" />
             <div className="absolute left-1/2 top-0 h-full w-[1px] bg-purple-500/20" />
-            
             <div className="absolute w-2 h-2 rounded-full bg-green-400 top-1/4 left-1/3 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
             <div className="absolute w-2 h-2 rounded-full bg-yellow-400 top-2/3 right-1/4 animate-pulse delay-500 shadow-[0_0_10px_rgba(250,204,21,0.8)]" />
             <div className="absolute w-2 h-2 rounded-full bg-fuchsia-400 bottom-1/3 left-1/2 animate-pulse delay-1000 shadow-[0_0_10px_rgba(217,70,239,0.8)]" />
-            
             <div className="absolute top-1/2 left-1/2 h-[50%] w-[1px] origin-top bg-gradient-to-t from-fuchsia-400 to-fuchsia-400/0 animate-radar-sweep shadow-[0_0_10px_rgba(217,70,239,0.5)]">
               <div className="absolute top-0 -left-16 w-32 h-[320px] bg-fuchsia-500/10 rounded-full blur-xl origin-top transition-transform transform -rotate-[5deg]" />
             </div>
-
             <div className="w-4 h-4 rounded-full bg-purple-600 border border-purple-400 shadow-[0_0_10px_rgba(168,85,247,1)] relative z-10" />
           </div>
-          
           <p className="absolute bottom-6 text-xs text-purple-300 font-mono">Actualizando telemetría... 1204 objetos detectados</p>
         </div>
-
       </div>
     </div>
   );
