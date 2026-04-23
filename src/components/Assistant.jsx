@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import { Star, X, Send } from "lucide-react";
+import { Star, X, Send, Loader2 } from "lucide-react"; // Añadimos Loader2 para el efecto de carga
+import { enviarMensajeChat } from '../Servicios/api'; // Importamos tu conexión
 
 function Assistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [isTyping, setIsTyping] = useState(false); // Nuevo: Estado para saber si la IA está pensando
 
   const [messages, setMessages] = useState([
-    { id: 1, type: 'ai', text: 'Hola, Comandante. Soy su asistente orbital. ¿En qué puedo ayudarla con la red de satélites hoy?' },
-    { id: 2, type: 'user', text: 'Muéstrame el estado de salud del satélite Sentinel-3B.' },
-    { id: 3, type: 'ai', text: 'Analizando telemetría... El Sentinel-3B reporta estado NOMINAL. Baterías al 94%, temperatura estable y órbita corregida. ¿Desea ver el gráfico de potencia?' }
+    { id: 1, type: 'ai', text: 'Hola, Comandante. Soy su asistente orbital. ¿En qué puedo ayudarla con la red de satélites hoy?' }
   ]);
 
   const messagesEndRef = useRef(null);
@@ -18,22 +18,38 @@ function Assistant() {
     }
   }, [messages, isOpen]);
 
-  const handleSendMessage = (e) => {
+  // --- FUNCIÓN DE ENVÍO CONECTADA AL BACKEND ---
+  const handleSendMessage = async (e) => {
     e.preventDefault(); 
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isTyping) return;
 
-    const newUserMsg = { id: Date.now(), type: 'user', text: inputValue };
+    const userText = inputValue;
+    const newUserMsg = { id: Date.now(), type: 'user', text: userText };
+    
     setMessages((prev) => [...prev, newUserMsg]);
     setInputValue(""); 
+    setIsTyping(true); // La IA empieza a "escribir"
 
-    setTimeout(() => {
+    try {
+      // 🚀 Llamamos a la API enviando el mensaje y el Token (que va dentro de la función)
+      const data = await enviarMensajeChat(userText);
+
       const aiResponse = { 
         id: Date.now() + 1, 
         type: 'ai', 
-        text: 'Entendido. Solicitud recibida. Esta es una respuesta de prueba de la interfaz hasta que conectemos el backend de IA. 🚀' 
+        text: data.respuesta || data.message || "Lo siento, Comandante. He perdido la conexión con el servidor central."
       };
+      
       setMessages((prev) => [...prev, aiResponse]);
-    }, 1000);
+    } catch (error) {
+      setMessages((prev) => [...prev, { 
+        id: Date.now() + 1, 
+        type: 'ai', 
+        text: "⚠️ Error en el enlace ascendente. Verifique sus credenciales de acceso." 
+      }]);
+    } finally {
+      setIsTyping(false); // La IA termina de escribir
+    }
   };
 
   return (
@@ -43,18 +59,15 @@ function Assistant() {
           
           <div className="p-3 md:p-4 border-b border-purple-500/20 flex items-center justify-between bg-gradient-to-r from-[#15092a] to-[#1e0a3c]">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-purple-600/30 border border-purple-400/50 shadow-[0_0_15px_rgba(168,85,247,0.6)]">
+              <div className="p-2 rounded-full bg-purple-600/30 border border-purple-400/50">
                 <Star size={16} className="text-white fill-fuchsia-100" />
               </div>
               <div>
-                <h3 className="text-sm md:text-md font-bold text-white leading-tight">Orbit <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">Assistant</span></h3>
+                <h3 className="text-sm md:text-md font-bold text-white leading-tight">Orbit Assistant</h3>
                 <p className="text-[10px] md:text-xs text-purple-300/70">IA Orbital en línea</p>
               </div>
             </div>
-            <button 
-              onClick={() => setIsOpen(false)}
-              className="text-purple-300 hover:text-white hover:bg-purple-500/20 p-1.5 rounded-full transition-all"
-            >
+            <button onClick={() => setIsOpen(false)} className="text-purple-300 hover:text-white p-1.5 rounded-full transition-all">
               <X size={20} />
             </button>
           </div>
@@ -63,38 +76,49 @@ function Assistant() {
             {messages.map((msg) => (
               <div key={msg.id} className={`flex w-full ${msg.type === 'user' ? 'justify-end' : ''}`}>
                 <div className={`flex gap-3 max-w-[90%] md:max-w-[85%] ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
-                  <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center border shadow-md ${
-                    msg.type === 'user' 
-                      ? 'bg-[#15092a] border-fuchsia-400/50 text-xs font-bold text-fuchsia-300' 
-                      : 'bg-gradient-to-br from-purple-600 to-fuchsia-600 border-purple-400/50'
+                  <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center border ${
+                    msg.type === 'user' ? 'bg-[#15092a] border-fuchsia-400/50 text-[10px] font-bold text-fuchsia-300' : 'bg-gradient-to-br from-purple-600 to-fuchsia-600'
                   }`}>
                     {msg.type === 'user' ? 'TÚ' : <Star size={14} className="text-white fill-white" />}
                   </div>
-                  <div className={`p-3 text-[13px] md:text-sm rounded-2xl leading-relaxed shadow-sm ${
-                    msg.type === 'user'
-                      ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(168,85,247,0.2)]'
-                      : 'bg-[#2a1457] text-purple-50 rounded-tl-none border border-purple-500/30'
+                  <div className={`p-3 text-[13px] md:text-sm rounded-2xl leading-relaxed ${
+                    msg.type === 'user' ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white rounded-tr-none' : 'bg-[#2a1457] text-purple-50 rounded-tl-none border border-purple-500/30'
                   }`}>
                     {msg.text}
                   </div>
                 </div>
               </div>
             ))}
+            
+            {/* --- INDICADOR DE CARGA (Cuando la IA piensa) --- */}
+            {isTyping && (
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center">
+                  <Loader2 size={14} className="text-white animate-spin" />
+                </div>
+                <div className="p-3 bg-[#2a1457] text-purple-300 rounded-2xl rounded-tl-none border border-purple-500/30 italic text-xs">
+                  Sincronizando con red neuronal...
+                </div>
+              </div>
+            )}
+
             <div ref={messagesEndRef} />
           </div>
 
           <form onSubmit={handleSendMessage} className="p-3 md:p-4 border-t border-purple-500/20 bg-[#15092a]/80">
-            <div className="flex items-center gap-2 bg-[#2a1457]/50 border border-purple-500/30 rounded-full p-1 md:p-1.5 pr-2 focus-within:border-fuchsia-400/80 focus-within:ring-1 focus-within:ring-fuchsia-400/30 transition-all shadow-inner">
+            <div className="flex items-center gap-2 bg-[#2a1457]/50 border border-purple-500/30 rounded-full p-1.5 pr-2 focus-within:border-fuchsia-400/80 transition-all">
               <input 
                 type="text" 
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Escribe tu mensaje..." 
-                className="flex-1 bg-transparent px-3 md:px-4 text-purple-100 placeholder:text-purple-300/50 outline-none text-[13px] md:text-sm"
+                placeholder={isTyping ? "IA procesando..." : "Escribe tu mensaje..."}
+                disabled={isTyping}
+                className="flex-1 bg-transparent px-3 text-purple-100 outline-none text-[13px] md:text-sm disabled:opacity-50"
               />
               <button 
                 type="submit"
-                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-1.5 md:p-2 rounded-full hover:scale-105 transition-all shadow-[0_0_10px_rgba(168,85,247,0.4)]"
+                disabled={isTyping}
+                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-2 rounded-full hover:scale-105 transition-all disabled:grayscale disabled:scale-100"
               >
                 <Send size={16} />
               </button>
@@ -103,14 +127,12 @@ function Assistant() {
         </div>
       )}
 
+      {/* Botón Flotante */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-3 md:p-4 rounded-full shadow-[0_0_15px_rgba(168,85,247,0.6)] hover:shadow-[0_0_30px_rgba(217,70,239,1)] hover:scale-110 transition-all duration-300 z-50 group border border-fuchsia-400/50 flex items-center justify-center"
+        className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all z-50 group border border-fuchsia-400/50"
       >
-        <Star 
-          size={24} 
-          className="text-white md:w-[30px] md:h-[30px] group-hover:fill-white group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,1)] transition-all duration-300" 
-        />
+        <Star size={24} className="text-white group-hover:fill-white transition-all duration-300" />
       </button>
     </>
   );
