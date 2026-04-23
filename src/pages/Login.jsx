@@ -59,12 +59,22 @@ function Login({ onClose }) {
                 
                 localStorage.setItem('orbitToken', datos.token);
                 localStorage.setItem('orbitspace_auth', 'true');
+                
                 if (datos.user || datos.usuario) {
                     localStorage.setItem('orbitUser', JSON.stringify(datos.user || datos.usuario));
+                } else {
+                    const nombreExtraido = formData.email.split('@')[0];
+                    const nombreFormateado = nombreExtraido.charAt(0).toUpperCase() + nombreExtraido.slice(1);
+                    
+                    localStorage.setItem('orbitUser', JSON.stringify({ 
+                        nombre: nombreFormateado, 
+                        email: formData.email 
+                    }));
                 }
                 
                 if (onClose) onClose();
                 navigate("/dashboard");
+                window.location.reload();
 
             } catch (error) {
                 setErrores({ email: "Credenciales denegadas por el servidor central." });
