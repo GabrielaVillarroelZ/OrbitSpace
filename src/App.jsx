@@ -14,9 +14,10 @@ import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 
 const ProtectedRoute = () => {
-  const isAuthenticated = localStorage.getItem('orbitspace_auth') === 'true';
+  const token = localStorage.getItem('orbitToken');
 
-  if (!isAuthenticated) {
+  if (!token) {
+    console.warn("⚠️ Acceso denegado: Nave no autorizada. Redirigiendo a la base.");
     return <Navigate to="/" replace />;
   }
 

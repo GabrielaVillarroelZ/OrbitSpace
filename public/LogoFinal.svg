@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   viewBox="0 0 1002.25 768"
+   id="svg12"
+   sodipodi:docname="LogoFinal.svg"
+   inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview12"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.80338542"
+     inkscape:cx="501.62723"
+     inkscape:cy="384"
+     inkscape:window-width="1256"
+     inkscape:window-height="836"
+     inkscape:window-x="221"
+     inkscape:window-y="33"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg12" />
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs
+     id="defs2">
+    <style
+       id="style1">
+      .st0 {
+        fill: url(#Degradado_sin_nombre_728);
+      }
+
+      .st1 {
+        fill: url(#Degradado_sin_nombre_729);
+      }
+
+      .st2 {
+        fill: url(#Degradado_sin_nombre_724);
+      }
+
+      .st3 {
+        fill: url(#Degradado_sin_nombre_725);
+      }
+
+      .st4 {
+        fill: url(#Degradado_sin_nombre_721);
+      }
+
+      .st5 {
+        fill: url(#Degradado_sin_nombre_722);
+      }
+
+      .st6 {
+        fill: url(#Degradado_sin_nombre_723);
+      }
+
+      .st7 {
+        fill: url(#Degradado_sin_nombre_726);
+      }
+
+      .st8 {
+        fill: url(#Degradado_sin_nombre_727);
+      }
+
+      .st9 {
+        fill: #fff;
+        stroke: #fff;
+        stroke-width: 6px;
+      }
+
+      .st9, .st10 {
+        stroke-miterlimit: 10;
+      }
+
+      .st11 {
+        fill: url(#Degradado_sin_nombre_72);
+      }
+
+      .st12 {
+        display: none;
+      }
+
+      .st10 {
+        fill: none;
+        stroke: #ccbdff;
+        stroke-width: 5px;
+      }
+    </style>
+    <linearGradient
+       id="Degradado_sin_nombre_72"
+       data-name="Degradado sin nombre 72"
+       x1="253.29"
+       y1="270.54"
+       x2="194.17"
+       y2="372.94"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#6b6cff"
+         id="stop1" />
+      <stop
+         offset="1"
+         stop-color="#b89cff"
+         id="stop2" />
+    </linearGradient>
+    <linearGradient
+       id="Degradado_sin_nombre_721"
+       data-name="Degradado sin nombre 72"
+       x1="321.92"
+       y1="303.39"
+       x2="284.5"
+       y2="368.19"
+       xlink:href="#Degradado_sin_nombre_72" />
+    <linearGradient
+       id="Degradado_sin_nombre_722"
+       data-name="Degradado sin nombre 72"
+       x1="388.76"
+       y1="304.54"
+       x2="348.11"
+       y2="374.95"
+       xlink:href="#Degradado_sin_nombre_72" />
+    <linearGradient
+       id="Degradado_sin_nombre_723"
+       data-name="Degradado sin nombre 72"
+       x1="460.15"
+       y1="293.52"
+       x2="418.66"
+       y2="365.4"
+       xlink:href="#Degradado_sin_nombre_72" />
+    <linearGradient
+       id="Degradado_sin_nombre_724"
+       data-name="Degradado sin nombre 72"
+       x1="503"
+       y1="303.42"
+       x2="468.1"
+       y2="363.86"
+       xlink:href="#Degradado_sin_nombre_72" />
+    <linearGradient
+       id="Degradado_sin_nombre_725"
+       data-name="Degradado sin nombre 72"
+       x1="571.01"
+       y1="280.59"
+       x2="522.3"
+       y2="364.96"
+       xlink:href="#Degradado_sin_nombre_72" />
+    <linearGradient
+       id="Degradado_sin_nombre_726"
+       data-name="Degradado sin nombre 72"
+       x1="643.84"
+       y1="307.76"
+       x2="590.63"
+       y2="399.91"
+       xlink:href="#Degradado_sin_nombre_72" />
+    <linearGradient
+       id="Degradado_sin_nombre_727"
+       data-name="Degradado sin nombre 72"
+       x1="741.1"
+       y1="304.07"
+       x2="700.81"
+       y2="373.85"
+       xlink:href="#Degradado_sin_nombre_72" />
+    <linearGradient
+       id="Degradado_sin_nombre_728"
+       data-name="Degradado sin nombre 72"
+       x1="815.77"
+       y1="311.45"
+       x2="781.97"
+       y2="369.98"
+       xlink:href="#Degradado_sin_nombre_72" />
+    <linearGradient
+       id="Degradado_sin_nombre_729"
+       data-name="Degradado sin nombre 72"
+       x1="893.41"
+       y1="311.46"
+       x2="859.62"
+       y2="370"
+       xlink:href="#Degradado_sin_nombre_72" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#Degradado_sin_nombre_72"
+       id="linearGradient71"
+       gradientUnits="userSpaceOnUse"
+       x1="253.29"
+       y1="270.54"
+       x2="194.17"
+       y2="372.94" />
+  </defs>
+  <g
+     id="Capa_1"
+     class="st12" />
+  <g
+     id="Trazo"
+     transform="matrix(5.5392315,0,0,6.2493854,-2418.1222,-1716.7816)">
+    <g
+       id="g11"
+       transform="translate(302.47002,13.692058)">
+      <path
+         class="st11"
+         d="m 193.79,372.7 c -9.1,-5.01 -16.31,-11.96 -21.64,-20.85 -5.33,-8.88 -7.99,-18.94 -7.99,-30.16 0,-11.22 2.66,-21.12 7.99,-30 5.33,-8.88 12.54,-15.83 21.64,-20.85 9.1,-5.01 19.08,-7.52 29.96,-7.52 10.88,0 21,2.51 30.04,7.52 9.04,5.01 16.2,11.96 21.47,20.85 5.27,8.89 7.91,18.88 7.91,30 0,11.12 -2.64,21.28 -7.91,30.16 -5.27,8.89 -12.46,15.83 -21.55,20.85 -9.1,5.01 -19.08,7.52 -29.96,7.52 -10.88,0 -20.86,-2.51 -29.96,-7.52 z m 52.95,-10.46 c 6.64,-3.7 11.83,-8.99 15.57,-15.88 3.74,-6.88 5.6,-14.87 5.6,-23.96 0,-9.09 -1.87,-17.05 -5.6,-23.87 -3.74,-6.82 -8.93,-12.04 -15.57,-15.68 -6.64,-3.63 -14.32,-5.45 -23.04,-5.45 -8.72,0 -16.44,1.82 -23.15,5.45 -6.71,3.64 -11.94,8.86 -15.67,15.68 -3.74,6.82 -5.61,14.78 -5.61,23.87 0,9.09 1.87,17.08 5.61,23.96 3.74,6.88 8.96,12.18 15.67,15.88 6.71,3.7 14.43,5.55 23.15,5.55 8.72,0 16.4,-1.85 23.04,-5.55 z"
+         id="path2"
+         style="fill:url(#linearGradient71)" />
+    </g>
+  </g>
+</svg>

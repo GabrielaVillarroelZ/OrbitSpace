@@ -1,6 +1,6 @@
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "./OrbitSpace-Logo.svg";
-import { useState } from "react";
+import logo from "./OrbitSpace-Logo.svg"; 
 import { AlertCircle } from "lucide-react";
 
 function Login({ onClose }) {
@@ -23,7 +23,7 @@ function Login({ onClose }) {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const nuevosErrores = {};
 
@@ -33,8 +33,8 @@ function Login({ onClose }) {
         if (!formData.email.includes("@")) {
             nuevosErrores.email = "Ingresa un correo válido.";
         }
-        if (vista !== "recuperar" && formData.password.length < 6) {
-            nuevosErrores.password = "La contraseña debe tener 6+ caracteres.";
+        if (vista !== "recuperar" && formData.password.length < 4) {
+            nuevosErrores.password = "La contraseña debe tener 4+ caracteres.";
         }
         if (vista === "registro" && formData.password !== formData.confirmPassword) {
             nuevosErrores.confirmPassword = "Las contraseñas no coinciden.";
@@ -46,18 +46,58 @@ function Login({ onClose }) {
         }
 
         if (vista === "Login") {
-            if (formData.email === "admin@orbitspace.com" && formData.password === "123456") {
+            try {
+                const respuesta = await fetch("https://orbitspace-backend.onrender.com/auth/login", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: formData.email, password: formData.password })
+                });
+
+                if (!respuesta.ok) throw new Error("Credenciales inválidas");
+
+                const datos = await respuesta.json();
+                
+                localStorage.setItem('orbitToken', datos.token);
                 localStorage.setItem('orbitspace_auth', 'true');
+                if (datos.user || datos.usuario) {
+                    localStorage.setItem('orbitUser', JSON.stringify(datos.user || datos.usuario));
+                }
+                
                 if (onClose) onClose();
                 navigate("/dashboard");
-            } else {
-                setErrores({ email: "Credenciales incorrectas" });
-                /*(Usa admin@orbitspace.com / 123456)*/
+
+            } catch (error) {
+                setErrores({ email: "Credenciales denegadas por el servidor central." });
             }
         } else if (vista === "registro") {
-            localStorage.setItem('orbitspace_auth', 'true');
-            if (onClose) onClose();
-            navigate("/dashboard");
+            try {
+                const respuesta = await fetch("https://orbitspace-backend.onrender.com/auth/register", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        nombre: formData.nombre,
+                        email: formData.email, 
+                        password: formData.password 
+                    })
+                });
+
+                if (!respuesta.ok) throw new Error("Fallo en el registro");
+
+                const datos = await respuesta.json();
+
+                if (datos.token) {
+                    localStorage.setItem('orbitToken', datos.token);
+                    localStorage.setItem('orbitspace_auth', 'true');
+                    if (onClose) onClose();
+                    navigate("/dashboard");
+                } else {
+                    alert("¡Recluta aceptado! Por favor, inicia sesión con tus nuevas credenciales.");
+                    cambiarVista("Login");
+                }
+
+            } catch (error) {
+                setErrores({ email: "Error de comunicación. Quizás el correo ya esté en uso." });
+            }
         } else if (vista === "recuperar") {
             cambiarVista("Login");
         }
