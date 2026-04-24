@@ -17,6 +17,7 @@ const GlobalStyles = () => (
 function Dashboard() {
   const [cargando, setCargando] = useState(true);
   const [satelites, setSatelites] = useState([]);
+  const [ubicacion, setUbicacion] = useState("Localizando base...");
   const starsArray = Array.from({ length: 40 });
 
   useEffect(() => {
@@ -32,6 +33,30 @@ function Dashboard() {
       }
     };
     cargarDatos();
+  }, []);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const respuesta = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const datos = await respuesta.json();
+          
+          const ciudad = datos.address.city || datos.address.town || datos.address.village || datos.address.state || "Base Secreta";
+          const pais = datos.address.country || "Planeta Tierra";
+          
+          setUbicacion(`${ciudad}, ${pais}`);
+        } catch (error) {
+          console.error("Error descifrando coordenadas", error);
+          setUbicacion("Señal GPS débil");
+        }
+      }, () => {
+        setUbicacion("Modo Incógnito Activado");
+      });
+    } else {
+      setUbicacion("Radar no disponible");
+    }
   }, []);
 
   if (cargando) return <LoaderOrbital mensaje="Sincronizando red de satélites..." />;
@@ -61,7 +86,7 @@ function Dashboard() {
           </div>
           <div className="flex items-center gap-2 text-xs text-purple-300">
              <MapPin size={14} className="text-fuchsia-400" />
-             Estación: <span className="text-white font-bold">Valencia (ESP)</span>
+             Estación: <span className="text-white font-bold">{ubicacion}</span>
           </div>
         </div>
 
