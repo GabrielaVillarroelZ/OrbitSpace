@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Rocket, Calendar, MapPin, Clock, Loader2 } from "lucide-react";
+import { Rocket, Calendar, MapPin, Clock, Loader2, Navigation } from "lucide-react";
 import { obtenerLanzamientos } from '../Servicios/api';
 
 const GlobalStyles = () => (
@@ -21,9 +21,14 @@ function Lanzamientos() {
     const cargarMisiones = async () => {
       try {
         const datos = await obtenerLanzamientos();
-        setMisiones(datos);
+        if (Array.isArray(datos)) {
+          setMisiones(datos);
+        } else {
+          setMisiones([]);
+        }
       } catch (error) {
         console.error("Error cargando misiones", error);
+        setMisiones([]);
       } finally {
         setCargando(false);
       }
@@ -32,9 +37,13 @@ function Lanzamientos() {
   }, []);
 
   const formatearFecha = (fechaRaw) => {
-    if (!fechaRaw) return "TBD";
-    const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
-    return new Date(fechaRaw).toLocaleDateString('es-ES', opciones);
+    if (!fechaRaw) return "Fecha por determinar";
+    try {
+      const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
+      return new Date(fechaRaw).toLocaleDateString('es-ES', opciones);
+    } catch (e) {
+      return fechaRaw;
+    }
   };
 
   return (
@@ -72,7 +81,7 @@ function Lanzamientos() {
         ) : misiones.length === 0 ? (
           <div className="text-center py-20 bg-[#1e103c]/20 rounded-3xl border border-dashed border-purple-500/30">
             <Rocket className="mx-auto text-purple-500/50 mb-4" size={64} />
-            <p className="text-purple-300/70 text-xl">No hay misiones programadas en este momento.</p>
+            <p className="text-purple-300/70 text-xl">No hay misiones programadas en la base de datos.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -82,30 +91,30 @@ function Lanzamientos() {
                   <div className="p-3 bg-purple-500/10 rounded-2xl group-hover:bg-fuchsia-500/20 transition-colors border border-purple-500/10 group-hover:border-fuchsia-500/30">
                     <Rocket className="text-purple-400 group-hover:text-fuchsia-400 transition-colors" size={28} />
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border text-green-400 bg-green-400/10 border-green-400/20`}>
-                    Confirmado
+                  <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border text-green-400 bg-green-400/10 border-green-400/20">
+                    Programado
                   </span>
                 </div>
                 
-                <h3 className="text-2xl font-bold mb-1 text-white group-hover:text-fuchsia-300 transition-colors">
-                  {mision.nombre_mision || mision.nombre || "Misión Desconocida"}
+                <h3 className="text-2xl font-bold mb-1 text-white group-hover:text-fuchsia-300 transition-colors line-clamp-1">
+                  {mision.nombre || "Misión Desconocida"}
                 </h3>
-                <p className="text-purple-300 font-medium text-sm mb-6">
-                  {mision.organizacion || mision.agencia || "Agencia Espacial"}
+                <p className="text-purple-300 font-medium text-sm mb-6 line-clamp-1">
+                  {mision.organizacion || "Agencia Espacial"}
                 </p>
 
                 <div className="space-y-3 text-sm text-purple-200/70">
                   <div className="flex items-center gap-3">
-                    <Calendar size={16} className="text-fuchsia-400" />
-                    <span>{formatearFecha(mision.fecha_lanzamiento)}</span>
+                    <Calendar size={16} className="text-fuchsia-400 shrink-0" />
+                    <span>{formatearFecha(mision.fecha)}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Clock size={16} className="text-fuchsia-400" />
-                    <span>00:00 UTC</span> 
+                    <Navigation size={16} className="text-fuchsia-400 shrink-0" />
+                    <span className="truncate">{mision.vehiculo || "Vehículo Clasificado"}</span> 
                   </div>
                   <div className="flex items-center gap-3">
                     <MapPin size={16} className="text-fuchsia-400 shrink-0" />
-                    <span>Puerto Espacial - Red Global</span>
+                    <span>Base de Lanzamiento Terrestre</span>
                   </div>
                 </div>
 

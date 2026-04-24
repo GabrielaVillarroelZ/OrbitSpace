@@ -11,14 +11,10 @@ export const login = async (email, password) => {
     const datos = await respuesta.json();
     localStorage.setItem('orbitToken', datos.token);
     
-    // --- PARCHE DE EMERGENCIA ---
     if (datos.user || datos.usuario) {
-      // Si Ángela lo arregla y envía el usuario, usamos el suyo
       localStorage.setItem('orbitUser', JSON.stringify(datos.user || datos.usuario));
     } else {
-      // Si no lo envía, extraemos el nombre del email (ej: de angela@test.com sacamos "angela")
       const nombreExtraido = email.split('@')[0];
-      // Ponemos la primera letra en mayúscula para que quede bonito ("Angela")
       const nombreFormateado = nombreExtraido.charAt(0).toUpperCase() + nombreExtraido.slice(1);
       
       localStorage.setItem('orbitUser', JSON.stringify({ 
@@ -58,8 +54,11 @@ export const obtenerLanzamientos = async () => {
 
 export const obtenerFavoritos = async () => {
   try {
-    const token = localStorage.getItem('orbitToken');
-    if (!token) throw new Error("No hay token");
+    const tokenRaw = localStorage.getItem('orbitToken');
+    if (!tokenRaw) return [];
+
+    const token = tokenRaw.replace(/['"]+/g, '').trim();
+
     const respuesta = await fetch("https://orbitspace-backend.onrender.com/favorites", {
       method: 'GET',
       headers: {
@@ -67,6 +66,7 @@ export const obtenerFavoritos = async () => {
         'Content-Type': 'application/json'
       }
     });
+
     if (!respuesta.ok) throw new Error("Error en favoritos");
     return await respuesta.json();
   } catch (error) {
@@ -77,13 +77,19 @@ export const obtenerFavoritos = async () => {
 
 export const toggleFavorito = async (vehiculoId) => {
   try {
-    const token = localStorage.getItem('orbitToken');
+    const tokenRaw = localStorage.getItem('orbitToken');
+    if (!tokenRaw) return false;
+
+    const token = tokenRaw.replace(/['"]+/g, '').trim();
+
     const respuesta = await fetch(`https://orbitspace-backend.onrender.com/favorites/${vehiculoId}`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` }
     });
+
     return respuesta.ok;
   } catch (error) {
+    console.error(error);
     return false;
   }
 };
@@ -100,34 +106,34 @@ export const cerrarSesion = () => {
   window.location.href = "/"; 
 };
 
-const obtenerToken = () => localStorage.getItem('orbitToken');
-
 export const enviarMensajeChat = async (mensaje) => {
   try {
-    const token = obtenerToken();
-    
-    // Si no hay token, ni siquiera intentamos la petición
-    if (!token) throw new Error("No hay sesión activa");
+    const tokenRaw = localStorage.getItem('orbitToken');
+    if (!tokenRaw) throw new Error("No hay sesión activa");
 
-    const respuesta = await fetch("https://orbitspace-backend.onrender.com/chat", {
+    const token = tokenRaw.replace(/['"]+/g, '').trim();
+
+    const respuesta = await fetch("https://orbitspace-backend.onrender.com/ai/chat", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 🚨 AQUÍ ESTÁ LA CLAVE: El servidor espera "Bearer" seguido del token
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ mensaje })
+      body: JSON.stringify({ mensaje, question: mensaje })
     });
 
+    if (respuesta.status === 405) {
+      return { respuesta: "❌ Error 405: Método no permitido." };
+    }
+
     if (respuesta.status === 401) {
-      // Si el token expiró o es inválido, cerramos sesión
       cerrarSesion();
       throw new Error("Sesión expirada");
     }
 
     return await respuesta.json();
   } catch (error) {
-    console.error("Error en el enlace del chat:", error);
+    console.error(error);
     return { error: "Error de comunicación" };
   }
 };

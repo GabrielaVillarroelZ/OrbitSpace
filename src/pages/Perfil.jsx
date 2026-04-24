@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Shield, Key, Camera, Activity, Heart, LogOut } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { obtenerDatosUsuario, cerrarSesion } from '../Servicios/api';
+import { Mail, Shield, Key, Camera, Activity, Heart, LogOut, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { obtenerDatosUsuario, cerrarSesion, obtenerFavoritos } from '../Servicios/api';
 
 function Perfil() {
     const navigate = useNavigate();
+    const [guardado, setGuardado] = useState(false);
     const [userData, setUserData] = useState({
         name: "Cargando...",
         email: "...",
+        iniciales: "CO",
         role: "Comandante Orbital",
         joinDate: "05 Abril 2026",
         stats: {
@@ -18,19 +20,44 @@ function Perfil() {
     });
 
     useEffect(() => {
-        const datos = obtenerDatosUsuario();
-        if (datos) {
-            setUserData(prev => ({
-                ...prev,
-                name: datos.nombre || datos.name || "Comandante",
-                email: datos.email || "desconocido@orbitspace.com"
-            }));
-        }
+        const inicializarPerfil = async () => {
+            const datos = obtenerDatosUsuario();
+            const favoritosReales = await obtenerFavoritos();
+
+            if (datos) {
+                const nombreReal = datos.nombre || datos.name || "Comandante";
+                const inicialesCalculadas = nombreReal
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .substring(0, 2);
+
+                setUserData(prev => ({
+                    ...prev,
+                    name: nombreReal,
+                    email: datos.email || "desconocido@orbit.space",
+                    iniciales: inicialesCalculadas || "CO",
+                    stats: {
+                        ...prev.stats,
+                        favoritos: Array.isArray(favoritosReales) ? favoritosReales.length : 0
+                    }
+                }));
+            }
+        };
+
+        inicializarPerfil();
     }, []);
 
     const handleLogout = (e) => {
         e.preventDefault();
         cerrarSesion();
+    };
+
+    const handleGuardar = (e) => {
+        e.preventDefault();
+        setGuardado(true);
+        setTimeout(() => setGuardado(false), 3000);
     };
 
     return (
@@ -53,12 +80,10 @@ function Perfil() {
                         
                         <div className="flex flex-col items-center text-center">
                             <div className="relative group cursor-pointer mb-4">
-                                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 p-1">
-                                    <div className="w-full h-full rounded-full bg-[#0a0414] flex items-center justify-center overflow-hidden relative">
-                                        <User size={40} className="text-purple-300" />
-                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Camera size={20} className="text-white" />
-                                        </div>
+                                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center border-4 border-purple-500/30 shadow-[0_0_20px_rgba(217,70,239,0.3)]">
+                                    <span className="text-3xl font-black text-white">{userData.iniciales}</span>
+                                    <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Camera size={24} className="text-white" />
                                     </div>
                                 </div>
                             </div>
@@ -96,7 +121,7 @@ function Perfil() {
                         <div className="bg-[#1a0b36]/60 border border-purple-500/20 rounded-2xl p-5 text-center">
                             <Heart size={24} className="text-fuchsia-400 mx-auto mb-2" />
                             <p className="text-3xl font-bold text-white">{userData.stats.favoritos}</p>
-                            <p className="text-xs text-purple-300/70 uppercase tracking-wide mt-1">Satélites</p>
+                            <p className="text-xs text-purple-300/70 uppercase tracking-wide mt-1">Favoritos</p>
                         </div>
                         <div className="bg-[#1a0b36]/60 border border-purple-500/20 rounded-2xl p-5 text-center">
                             <Activity size={24} className="text-purple-400 mx-auto mb-2" />
@@ -116,7 +141,7 @@ function Perfil() {
                             Credenciales de Seguridad
                         </h3>
 
-                        <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+                        <form className="space-y-5" onSubmit={handleGuardar}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div className="space-y-1">
                                     <label className="text-xs font-medium text-purple-300 ml-1">Nombre Público</label>
@@ -148,8 +173,22 @@ function Perfil() {
                             </div>
 
                             <div className="pt-4 flex justify-end">
-                                <button type="submit" className="px-6 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                                    Actualizar Credenciales
+                                <button 
+                                    type="submit" 
+                                    className={`px-6 py-3 font-bold rounded-xl transition-all flex items-center gap-2 ${
+                                        guardado 
+                                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                                        : 'bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
+                                    }`}
+                                >
+                                    {guardado ? (
+                                        <>
+                                            <CheckCircle2 size={20} />
+                                            Actualizado
+                                        </>
+                                    ) : (
+                                        'Actualizar Credenciales'
+                                    )}
                                 </button>
                             </div>
                         </form>

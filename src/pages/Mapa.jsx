@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Globe from 'react-globe.gl';
 import { Heart, X, Info, Radio, Zap } from 'lucide-react';
-import { obtenerSatelites } from '../Servicios/api'; 
+import { obtenerSatelites, obtenerFavoritos, toggleFavorito } from '../Servicios/api'; 
 
 function Mapa() {
     const globeEl = useRef();
@@ -32,29 +32,48 @@ function Mapa() {
         }
     };
 
+    const cargarFavs = async () => {
+        const favsDelServidor = await obtenerFavoritos();
+        if (Array.isArray(favsDelServidor)) {
+            setFavoritos(favsDelServidor);
+        }
+    };
+
     useEffect(() => {
         cargarDatos();
-        // Mantenemos una actualización cada 10 segundos por si acaso
-        const interval = setInterval(cargarDatos, 10000);
+        cargarFavs();
+        const interval = setInterval(cargarDatos, 15000);
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             if (globeEl.current) {
                 globeEl.current.controls().autoRotate = true;
                 globeEl.current.controls().autoRotateSpeed = 0.5;
                 globeEl.current.pointOfView({ lat: 20, lng: 0, altitude: 2 });
             }
         }, 100);
+        return () => clearTimeout(timer);
     }, []);
 
-    const toggleFavorite = (sat) => {
-        if (favoritos.find(f => f.id === sat.id)) {
-            setFavoritos(favoritos.filter(f => f.id !== sat.id));
-        } else {
-            setFavoritos([...favoritos, sat]);
+    const handleToggleFavorite = async (sat) => {
+        const idSatelite = sat.id || sat.vehiculo_id;
+        const exito = await toggleFavorito(idSatelite);
+        
+        if (exito) {
+            const esFavorito = favoritos.find(f => f.vehiculo_id === idSatelite || f.id === idSatelite);
+            
+            if (esFavorito) {
+                setFavoritos(favoritos.filter(f => f.vehiculo_id !== idSatelite && f.id !== idSatelite));
+            } else {
+                setFavoritos([...favoritos, { id: idSatelite, vehiculo_id: idSatelite }]);
+            }
         }
+    };
+
+    const isFav = (satId) => {
+        return favoritos.find(f => f.id === satId || f.vehiculo_id === satId);
     };
 
     return (
@@ -121,13 +140,13 @@ function Mapa() {
                         </div>
 
                         <button 
-                            onClick={() => toggleFavorite(selectedSat)}
+                            onClick={() => handleToggleFavorite(selectedSat)}
                             className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${
-                                favoritos.find(f => f.id === selectedSat.id) ? 'bg-fuchsia-600 text-white' : 'bg-white/10 text-purple-200 border border-white/10'
+                                isFav(selectedSat.id) ? 'bg-fuchsia-600 text-white' : 'bg-white/10 text-purple-200 border border-white/10'
                             }`}
                         >
-                            <Heart size={20} fill={favoritos.find(f => f.id === selectedSat.id) ? "white" : "none"} />
-                            {favoritos.find(f => f.id === selectedSat.id) ? 'En Favoritos' : 'Seguir Satélite'}
+                            <Heart size={20} fill={isFav(selectedSat.id) ? "white" : "none"} />
+                            {isFav(selectedSat.id) ? 'En Favoritos' : 'Seguir Satélite'}
                         </button>
                     </div>
                 )}
