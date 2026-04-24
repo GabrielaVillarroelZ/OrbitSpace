@@ -119,7 +119,7 @@ export const enviarMensajeChat = async (mensaje) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ mensaje, question: mensaje })
+      body: JSON.stringify({ question: mensaje })
     });
 
     if (respuesta.status === 405) {
@@ -131,9 +131,10 @@ export const enviarMensajeChat = async (mensaje) => {
       throw new Error("Sesión expirada");
     }
 
-    return await respuesta.json();
+    const data = await respuesta.json();
+    return { respuesta: data.answer || "Sin respuesta del satélite de IA." };
   } catch (error) {
     console.error(error);
-    return { error: "Error de comunicación" };
+    return { error: "Error de comunicación con la IA" };
   }
 };

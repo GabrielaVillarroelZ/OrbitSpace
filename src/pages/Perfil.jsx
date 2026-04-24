@@ -33,14 +33,24 @@ function Perfil() {
                     .toUpperCase()
                     .substring(0, 2);
 
+                const fechaRaw = datos.fecha_registro || new Date().toISOString();
+                const opcionesFecha = { day: '2-digit', month: 'long', year: 'numeric' };
+                const fechaFormateada = new Date(fechaRaw).toLocaleDateString('es-ES', opcionesFecha);
+
+                const horasReales = datos.horas_vuelo || 0;
+                const alertasReales = datos.alertas || 0;
+
                 setUserData(prev => ({
                     ...prev,
                     name: nombreReal,
                     email: datos.email || "desconocido@orbit.space",
                     iniciales: inicialesCalculadas || "CO",
+                    joinDate: fechaFormateada,
                     stats: {
                         ...prev.stats,
-                        favoritos: Array.isArray(favoritosReales) ? favoritosReales.length : 0
+                        favoritos: Array.isArray(favoritosReales) ? favoritosReales.length : 0,
+                        horasVuelo: horasReales,
+                        alertas: alertasReales
                     }
                 }));
             }
