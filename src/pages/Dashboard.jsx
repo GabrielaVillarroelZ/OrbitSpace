@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LoaderOrbital from '../components/LoaderOrbital';
 import { Satellite, Rocket, Activity, CheckCircle2, AlertTriangle, Wifi, Search, MapPin } from 'lucide-react';
-// 🔥 Añadimos obtenerLanzamientos a la importación
 import { obtenerSatelites, obtenerLanzamientos } from '../Servicios/api';
 
 const GlobalStyles = () => (
@@ -18,57 +17,54 @@ const GlobalStyles = () => (
 function Dashboard() {
   const [cargando, setCargando] = useState(true);
   const [satelites, setSatelites] = useState([]);
-  // 🔥 Nuevo estado para los lanzamientos
   const [lanzamientos, setLanzamientos] = useState([]);
   const [ubicacion, setUbicacion] = useState("Localizando base...");
   const starsArray = Array.from({ length: 40 });
 
   useEffect(() => {
-    const cargarDatos = async () => {
+    const cargarTelemetria = async () => {
       setCargando(true);
       try {
-        // 🔥 Descargamos Satélites y Lanzamientos a la vez para ir más rápido
+        let lat = 41.38;
+        let lng = 2.17;
+
+        if (navigator.geolocation) {
+          const position = await new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(resolve, () => resolve(null), { timeout: 5000 });
+          });
+          if (position) {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+            
+            try {
+              const resGeo = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+              const geoData = await resGeo.json();
+              const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.state || "Base Secreta";
+              setUbicacion(`${ciudad}, ${geoData.address.country || "Tierra"}`);
+            } catch (e) {
+              setUbicacion("Coordenadas Privadas");
+            }
+          } else {
+            setUbicacion("Barcelona, España");
+          }
+        }
+
         const [datosSatelites, datosLanzamientos] = await Promise.all([
-            obtenerSatelites(),
+            obtenerSatelites(lat, lng),
             obtenerLanzamientos()
         ]);
         
         setSatelites(Array.isArray(datosSatelites) ? datosSatelites : []);
         setLanzamientos(Array.isArray(datosLanzamientos) ? datosLanzamientos : []);
       } catch (error) {
-        console.error("Error en telemetría:", error);
+        console.error(error);
       } finally {
         setCargando(false);
       }
     };
-    cargarDatos();
+    cargarTelemetria();
   }, []);
 
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          const respuesta = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-          const datos = await respuesta.json();
-          
-          const ciudad = datos.address.city || datos.address.town || datos.address.village || datos.address.state || "Base Secreta";
-          const pais = datos.address.country || "Planeta Tierra";
-          
-          setUbicacion(`${ciudad}, ${pais}`);
-        } catch (error) {
-          console.error("Error descifrando coordenadas", error);
-          setUbicacion("Señal GPS débil");
-        }
-      }, () => {
-        setUbicacion("Modo Incógnito Activado");
-      });
-    } else {
-      setUbicacion("Radar no disponible");
-    }
-  }, []);
-
-  // 🔥 Lógica para formatear la fecha del próximo lanzamiento (si hay)
   let textoProximoLanzamiento = "Sin misiones";
   if (lanzamientos.length > 0) {
       const fechaRaw = lanzamientos[0].date;
@@ -128,12 +124,10 @@ function Dashboard() {
               <p className="text-purple-300/80 text-sm font-medium">Lanzamientos</p>
               <div className="p-2.5 bg-fuchsia-500/20 rounded-xl text-fuchsia-400 border border-fuchsia-500/20"><Rocket size={20} /></div>
             </div>
-            {/* 🔥 Aquí mostramos el número real de lanzamientos */}
             <h2 className="text-4xl font-extrabold text-white group-hover:text-fuchsia-300 transition-colors drop-shadow-[0_0_8px_rgba(217,70,239,0.5)]">
               {lanzamientos.length}
             </h2>
             <div className="mt-4 flex items-center gap-2 text-xs text-purple-300">
-                {/* 🔥 Aquí mostramos la fecha formateada del próximo */}
                 <span className="font-bold text-fuchsia-300 animate-pulse">{textoProximoLanzamiento}</span>
             </div>
           </div>
@@ -157,7 +151,6 @@ function Dashboard() {
                     <div className="flex items-center gap-3">
                       <div className={`w-2 h-2 rounded-full ${nominal ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`}></div>
                       <div>
-                        {/* 🔥 Sincronizado con las keys en inglés del backend */}
                         <p className="text-xs font-bold text-white leading-tight w-[130px] truncate">
                           {sat.name || sat.nombre || "Desconocido"}
                         </p>

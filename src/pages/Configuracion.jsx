@@ -16,16 +16,12 @@ const usePerformanceMode = () => {
 
 const GlobalStyles = () => (
   <style>{`
-    .toggle-checkbox:checked {
-      right: 0;
-      border-color: #d946ef;
-    }
     .toggle-checkbox:checked + .toggle-label {
       background-color: rgba(217, 70, 239, 0.2);
       border-color: rgba(217, 70, 239, 0.5);
     }
-    .toggle-checkbox:checked + .toggle-label:after {
-      transform: translateX(100%);
+    .toggle-checkbox:checked + .toggle-label span {
+      transform: translateX(1.5rem);
       background-color: #d946ef;
       box-shadow: 0 0 10px #d946ef;
     }
@@ -39,10 +35,9 @@ const Toggle = ({ id, label, defaultChecked, disabled }) => {
       <label htmlFor={id} className="text-sm text-purple-200 cursor-pointer select-none font-medium">
         {label}
       </label>
-      <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+      <div className="relative inline-block w-12 align-middle select-none transition duration-200 ease-in">
         <input 
           type="checkbox" 
-          name={id} 
           id={id} 
           checked={isChecked}
           onChange={() => setIsChecked(!isChecked)}
@@ -51,9 +46,9 @@ const Toggle = ({ id, label, defaultChecked, disabled }) => {
         />
         <label 
           htmlFor={id} 
-          className="toggle-label block overflow-hidden h-6 rounded-full bg-[#15092a] border border-purple-500/30 cursor-pointer transition-all duration-300 relative before:absolute before:inset-0 before:bg-fuchsia-500/20 before:opacity-0"
+          className="toggle-label block overflow-hidden h-6 rounded-full bg-[#15092a] border border-purple-500/30 cursor-pointer transition-all duration-300 relative"
         >
-          <span className={`absolute left-1 top-1 w-4 h-4 rounded-full transition-all duration-300 ${isChecked ? 'translate-x-6 bg-fuchsia-400 shadow-[0_0_10px_rgba(217,70,239,0.8)]' : 'bg-purple-500/50'}`}></span>
+          <span className={`absolute left-1 top-1 w-4 h-4 rounded-full transition-all duration-300 bg-purple-500/50`}></span>
         </label>
       </div>
     </div>
@@ -68,7 +63,6 @@ function Configuracion() {
       <GlobalStyles />
 
       <div className="max-w-4xl mx-auto relative z-10">
-        
         <div className="mb-10 border-b border-purple-500/20 pb-8">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4 flex items-center gap-4 text-white">
             Parámetros del <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-fuchsia-500">Sistema</span>
@@ -80,8 +74,7 @@ function Configuracion() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          
-          <div className={`bg-[#1e103c]/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-3xl transition-all ${mode === 'high' ? 'hover:border-purple-500/40 shadow-lg' : 'bg-[#15092a]/80 backdrop-blur-none border-purple-900/30'}`}>
+          <div className={`bg-[#1e103c]/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-3xl transition-all ${mode === 'high' ? 'hover:border-purple-500/40 shadow-lg' : 'bg-[#15092a]/80 border-purple-900/30'}`}>
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-white">
               <div className="p-2 bg-purple-500/20 rounded-xl border border-purple-500/20"><Bell size={20} className="text-fuchsia-400" /></div>
               Alertas del Centro Espacial
@@ -93,7 +86,7 @@ function Configuracion() {
             </div>
           </div>
 
-          <div className={`bg-[#1e103c]/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-3xl transition-all ${mode === 'high' ? 'hover:border-purple-500/40 shadow-lg' : 'bg-[#15092a]/80 backdrop-blur-none border-purple-900/30'}`}>
+          <div className={`bg-[#1e103c]/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-3xl transition-all ${mode === 'high' ? 'hover:border-purple-500/40 shadow-lg' : 'bg-[#15092a]/80 border-purple-900/30'}`}>
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-white">
               <div className="p-2 bg-blue-500/20 rounded-xl border border-blue-500/20"><Wifi size={20} className="text-blue-400" /></div>
               Conexión y Telemetría
@@ -104,18 +97,19 @@ function Configuracion() {
                 <label className="text-sm text-purple-200 block mb-2 font-medium">Frecuencia de Ping Orbital</label>
                 <select 
                   className="w-full bg-[#15092a] border border-purple-500/30 rounded-xl px-4 py-2.5 text-sm text-purple-100 outline-none focus:border-fuchsia-400/50"
-                  value={mode === 'eco' ? "Modo Ahorro de Ancho de Banda (30s)" : undefined}
+                  value={mode === 'eco' ? "30s" : undefined}
                   disabled={mode === 'eco'}
+                  onChange={() => {}}
                 >
-                  <option>Alta Frecuencia (1s)</option>
-                  <option>Estándar (5s)</option>
-                  <option>Modo Ahorro de Ancho de Banda (30s)</option>
+                  <option value="1s">Alta Frecuencia (1s)</option>
+                  <option value="5s">Estándar (5s)</option>
+                  <option value="30s">Modo Ahorro (30s)</option>
                 </select>
               </div>
             </div>
           </div>
 
-          <div className={`bg-[#1e103c]/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-3xl transition-all ${mode === 'high' ? 'hover:border-purple-500/40 shadow-lg' : 'bg-[#15092a]/80 backdrop-blur-none border-purple-900/30'}`}>
+          <div className={`bg-[#1e103c]/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-3xl transition-all ${mode === 'high' ? 'hover:border-purple-500/40 shadow-lg' : 'bg-[#15092a]/80 border-purple-900/30'}`}>
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-white">
               <div className="p-2 bg-green-500/20 rounded-xl border border-green-500/20"><Shield size={20} className="text-green-400" /></div>
               Seguridad y Encriptación
@@ -129,14 +123,13 @@ function Configuracion() {
             </div>
           </div>
 
-          <div className={`bg-[#1e103c]/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-3xl transition-all ${mode === 'high' ? 'hover:border-purple-500/40 shadow-lg' : 'bg-[#15092a]/80 backdrop-blur-none border-purple-900/30 border-2 border-green-500/20'}`}>
+          <div className={`bg-[#1e103c]/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-3xl transition-all ${mode === 'high' ? 'hover:border-purple-500/40 shadow-lg' : 'bg-[#15092a]/80 border-2 border-green-500/20 shadow-[0_0_20px_rgba(34,197,94,0.1)]'}`}>
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-white">
               <div className={`p-2 rounded-xl border ${mode === 'high' ? 'bg-yellow-500/20 border-yellow-500/20' : 'bg-green-500/20 border-green-500/20'}`}>
                 <Monitor size={20} className={mode === 'high' ? "text-yellow-400" : "text-green-400"} />
               </div>
               Rendimiento Visual
             </h3>
-            
             <div className="flex gap-4 mb-4">
               <button 
                 onClick={() => setMode('high')}
@@ -145,24 +138,21 @@ function Configuracion() {
                 <Zap size={24} className={mode === 'high' ? 'text-fuchsia-400' : 'text-purple-400'} />
                 <span className={`text-xs font-bold ${mode === 'high' ? 'text-fuchsia-300' : 'text-purple-300'}`}>Máxima Calidad</span>
               </button>
-              
               <button 
                 onClick={() => setMode('eco')}
                 className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${mode === 'eco' ? 'border-green-500/50 bg-green-500/10 shadow-[0_0_15px_rgba(34,197,94,0.2)]' : 'border-purple-500/10 hover:border-purple-500/30 bg-[#15092a]/50'}`}
               >
                 <Battery size={24} className={mode === 'eco' ? 'text-green-400' : 'text-purple-400'} />
-                <span className={`text-xs font-bold ${mode === 'eco' ? 'text-green-300' : 'text-purple-300'}`}>Modo Eco (Sigilo)</span>
+                <span className={`text-xs font-bold ${mode === 'eco' ? 'text-green-300' : 'text-purple-300'}`}>Modo Eco</span>
               </button>
             </div>
-
             {mode === 'eco' && (
-              <div className="mb-2 flex items-start gap-2 text-xs text-green-300 bg-green-500/10 p-3 rounded-xl border border-green-500/20">
+              <div className="flex items-start gap-2 text-xs text-green-300 bg-green-500/10 p-3 rounded-xl border border-green-500/20">
                 <AlertCircle size={14} className="shrink-0 mt-0.5" />
-                <p>Modo Sigilo activo. Se han desactivado las partículas espaciales, brillos HD y telemetría en tiempo real para ahorrar un 45% de batería y CPU.</p>
+                <p>Modo Sigilo activo. Se han optimizado los recursos para ahorrar batería y CPU.</p>
               </div>
             )}
           </div>
-
         </div>
 
         <div className="mt-10 flex justify-end">
@@ -171,7 +161,6 @@ function Configuracion() {
             Aplicar Configuración
           </button>
         </div>
-
       </div>
     </div>
   );
