@@ -54,10 +54,8 @@ export const obtenerLanzamientos = async () => {
 
 export const obtenerFavoritos = async () => {
   try {
-    const tokenRaw = localStorage.getItem('orbitToken');
-    if (!tokenRaw) return [];
-
-    const token = tokenRaw.replace(/['"]+/g, '').trim();
+    const token = localStorage.getItem('orbitToken');
+    if (!token) return [];
 
     const respuesta = await fetch("https://orbitspace-backend.onrender.com/favorites", {
       method: 'GET',
@@ -77,14 +75,16 @@ export const obtenerFavoritos = async () => {
 
 export const toggleFavorito = async (vehiculoId) => {
   try {
-    const tokenRaw = localStorage.getItem('orbitToken');
-    if (!tokenRaw) return false;
-
-    const token = tokenRaw.replace(/['"]+/g, '').trim();
+    const token = localStorage.getItem('orbitToken');
+    if (!token) return false;
 
     const respuesta = await fetch(`https://orbitspace-backend.onrender.com/favorites/${vehiculoId}`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
     });
 
     return respuesta.ok;
@@ -108,16 +108,14 @@ export const cerrarSesion = () => {
 
 export const enviarMensajeChat = async (mensaje) => {
   try {
-    const tokenRaw = localStorage.getItem('orbitToken');
-    if (!tokenRaw) throw new Error("No hay sesión activa");
-
-    const token = tokenRaw.replace(/['"]+/g, '').trim();
+    const token = localStorage.getItem('orbitToken');
+    if (!token) throw new Error("No hay sesión activa");
 
     const respuesta = await fetch("https://orbitspace-backend.onrender.com/ai/chat", {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ question: mensaje })
     });

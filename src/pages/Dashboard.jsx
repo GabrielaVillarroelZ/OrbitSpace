@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import LoaderOrbital from '../components/LoaderOrbital';
 import { Satellite, Rocket, Activity, CheckCircle2, AlertTriangle, Wifi, Search, MapPin } from 'lucide-react';
-import { obtenerSatelites } from '../Servicios/api';
+// 🔥 Añadimos obtenerLanzamientos a la importación
+import { obtenerSatelites, obtenerLanzamientos } from '../Servicios/api';
 
 const GlobalStyles = () => (
   <style>{`
@@ -17,6 +18,8 @@ const GlobalStyles = () => (
 function Dashboard() {
   const [cargando, setCargando] = useState(true);
   const [satelites, setSatelites] = useState([]);
+  // 🔥 Nuevo estado para los lanzamientos
+  const [lanzamientos, setLanzamientos] = useState([]);
   const [ubicacion, setUbicacion] = useState("Localizando base...");
   const starsArray = Array.from({ length: 40 });
 
@@ -24,10 +27,16 @@ function Dashboard() {
     const cargarDatos = async () => {
       setCargando(true);
       try {
-        const datos = await obtenerSatelites();
-        setSatelites(datos);
+        // 🔥 Descargamos Satélites y Lanzamientos a la vez para ir más rápido
+        const [datosSatelites, datosLanzamientos] = await Promise.all([
+            obtenerSatelites(),
+            obtenerLanzamientos()
+        ]);
+        
+        setSatelites(Array.isArray(datosSatelites) ? datosSatelites : []);
+        setLanzamientos(Array.isArray(datosLanzamientos) ? datosLanzamientos : []);
       } catch (error) {
-        console.error(error);
+        console.error("Error en telemetría:", error);
       } finally {
         setCargando(false);
       }
@@ -58,6 +67,18 @@ function Dashboard() {
       setUbicacion("Radar no disponible");
     }
   }, []);
+
+  // 🔥 Lógica para formatear la fecha del próximo lanzamiento (si hay)
+  let textoProximoLanzamiento = "Sin misiones";
+  if (lanzamientos.length > 0) {
+      const fechaRaw = lanzamientos[0].date;
+      if (fechaRaw) {
+          const opciones = { day: 'numeric', month: 'short' };
+          textoProximoLanzamiento = `Próximo: ${new Date(fechaRaw).toLocaleDateString('es-ES', opciones)}`;
+      } else {
+          textoProximoLanzamiento = "Programado";
+      }
+  }
 
   if (cargando) return <LoaderOrbital mensaje="Sincronizando red de satélites..." />;
 
@@ -107,8 +128,14 @@ function Dashboard() {
               <p className="text-purple-300/80 text-sm font-medium">Lanzamientos</p>
               <div className="p-2.5 bg-fuchsia-500/20 rounded-xl text-fuchsia-400 border border-fuchsia-500/20"><Rocket size={20} /></div>
             </div>
-            <h2 className="text-4xl font-extrabold text-white group-hover:text-fuchsia-300 transition-colors drop-shadow-[0_0_8px_rgba(217,70,239,0.5)]">3</h2>
-            <div className="mt-4 flex items-center gap-2 text-xs text-purple-300"><span className="font-bold text-fuchsia-300 animate-pulse">T-minus 4h 20m</span></div>
+            {/* 🔥 Aquí mostramos el número real de lanzamientos */}
+            <h2 className="text-4xl font-extrabold text-white group-hover:text-fuchsia-300 transition-colors drop-shadow-[0_0_8px_rgba(217,70,239,0.5)]">
+              {lanzamientos.length}
+            </h2>
+            <div className="mt-4 flex items-center gap-2 text-xs text-purple-300">
+                {/* 🔥 Aquí mostramos la fecha formateada del próximo */}
+                <span className="font-bold text-fuchsia-300 animate-pulse">{textoProximoLanzamiento}</span>
+            </div>
           </div>
         
           <div className="bg-[#1a0b36]/70 backdrop-blur-md border border-purple-500/30 p-6 rounded-3xl shadow-[0_0_20px_rgba(168,85,247,0.1)] hover:border-fuchsia-400/50 transition-all group xl:order-last">
@@ -124,17 +151,18 @@ function Dashboard() {
             <h3 className="text-lg font-bold mb-5 flex items-center gap-2 shrink-0"><Wifi size={18} className="text-fuchsia-400" />Telemetría Real</h3>
             <div className="space-y-3.5 overflow-y-auto pr-2 pb-2">
               {satelites.map((sat) => {
-                const nominal = (sat.estado || 'activo').toLowerCase() === 'activo';
+                const nominal = (sat.estado || sat.status || 'activo').toLowerCase() === 'activo';
                 return (
-                  <div key={sat.id || sat.vehiculo_id} className="flex items-center justify-between p-3 bg-purple-500/10 rounded-xl border border-purple-500/20 hover:border-fuchsia-400/50 transition-all">
+                  <div key={sat.id || sat.vehiculo_id || Math.random()} className="flex items-center justify-between p-3 bg-purple-500/10 rounded-xl border border-purple-500/20 hover:border-fuchsia-400/50 transition-all">
                     <div className="flex items-center gap-3">
                       <div className={`w-2 h-2 rounded-full ${nominal ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`}></div>
                       <div>
-                        <p className="text-xs font-bold text-white leading-tight">
-                          {sat.name || sat.nombre_vehiculo || sat.nombre || "Desconocido"}
+                        {/* 🔥 Sincronizado con las keys en inglés del backend */}
+                        <p className="text-xs font-bold text-white leading-tight w-[130px] truncate">
+                          {sat.name || sat.nombre || "Desconocido"}
                         </p>
                         <p className="text-[10px] text-purple-300/70">
-                          GPS: {sat.lat || sat.latitud || '0'}, {sat.lng || sat.longitud || '0'}
+                          GPS: {parseFloat(sat.lat || sat.latitud || 0).toFixed(2)}, {parseFloat(sat.lng || sat.longitud || 0).toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -160,12 +188,12 @@ function Dashboard() {
               const lng = parseFloat(sat.lng || sat.longitud || 0);
               const topPos = 50 - (lat / 90) * 40; 
               const leftPos = 50 + (lng / 180) * 40;
-              const nominal = (sat.estado || 'activo').toLowerCase() === 'activo';
+              const nominal = (sat.estado || sat.status || 'activo').toLowerCase() === 'activo';
 
               return (
                 <div key={`radar-${sat.id || index}`} className={`absolute w-2 h-2 rounded-full ${nominal ? 'bg-green-400' : 'bg-yellow-400'} animate-pulse`}
                   style={{ top: `${topPos}%`, left: `${leftPos}%`, boxShadow: `0 0 10px ${nominal ? 'rgba(74,222,128,0.8)' : 'rgba(250,204,21,0.8)'}` }}
-                  title={sat.name || sat.nombre_vehiculo || "Desconocido"}
+                  title={sat.name || sat.nombre || "Desconocido"}
                 />
               );
             })}

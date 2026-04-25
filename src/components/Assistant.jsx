@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { Star, X, Send, Loader2 } from "lucide-react"; // Añadimos Loader2 para el efecto de carga
-import { enviarMensajeChat } from '../Servicios/api'; // Importamos tu conexión
+import { Star, X, Send, Loader2 } from "lucide-react";
+import { enviarMensajeChat } from '../Servicios/api';
 
 function Assistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [isTyping, setIsTyping] = useState(false); // Nuevo: Estado para saber si la IA está pensando
+  const [isTyping, setIsTyping] = useState(false); 
 
   const [messages, setMessages] = useState([
     { id: 1, type: 'ai', text: 'Hola, Comandante. Soy su asistente orbital. ¿En qué puedo ayudarla con la red de satélites hoy?' }
@@ -18,7 +18,6 @@ function Assistant() {
     }
   }, [messages, isOpen]);
 
-  // --- FUNCIÓN DE ENVÍO CONECTADA AL BACKEND ---
   const handleSendMessage = async (e) => {
     e.preventDefault(); 
     if (!inputValue.trim() || isTyping) return;
@@ -28,10 +27,9 @@ function Assistant() {
     
     setMessages((prev) => [...prev, newUserMsg]);
     setInputValue(""); 
-    setIsTyping(true); // La IA empieza a "escribir"
+    setIsTyping(true);
 
     try {
-      // 🚀 Llamamos a la API enviando el mensaje y el Token (que va dentro de la función)
       const data = await enviarMensajeChat(userText);
 
       const aiResponse = { 
@@ -48,7 +46,7 @@ function Assistant() {
         text: "⚠️ Error en el enlace ascendente. Verifique sus credenciales de acceso." 
       }]);
     } finally {
-      setIsTyping(false); // La IA termina de escribir
+      setIsTyping(false); 
     }
   };
 
@@ -90,7 +88,6 @@ function Assistant() {
               </div>
             ))}
             
-            {/* --- INDICADOR DE CARGA (Cuando la IA piensa) --- */}
             {isTyping && (
               <div className="flex gap-3">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center">
@@ -127,7 +124,6 @@ function Assistant() {
         </div>
       )}
 
-      {/* Botón Flotante */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all z-50 group border border-fuchsia-400/50"

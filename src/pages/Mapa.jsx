@@ -8,6 +8,7 @@ function Mapa() {
     const [selectedSat, setSelectedSat] = useState(null);
     const [favoritos, setFavoritos] = useState([]);
     const [satellites, setSatellites] = useState([]);
+    
 
     const cargarDatos = async () => {
         try {
@@ -15,14 +16,14 @@ function Mapa() {
             if (!datos || !Array.isArray(datos)) return;
 
             const mapeados = datos.map(sat => ({
-                id: sat.id || sat.satid || sat.vehiculo_id || Math.random(),
-                lat: parseFloat(sat.lat || sat.satlat || sat.latitud || 0),
-                lng: parseFloat(sat.lng || sat.satlng || sat.longitud || 0),
-                name: sat.name || sat.satname || sat.nombre || 'Objeto Orbital',
+                id: sat.id || sat.vehiculo_id || Math.random(),
+                lat: parseFloat(sat.lat || sat.latitud || 0),
+                lng: parseFloat(sat.lng || sat.longitud || 0),
+                name: sat.name || sat.nombre || 'Objeto Orbital',
                 type: 'Satélite',
-                estado: 'ACTIVO',
-                speed: sat.speed || sat.satvelocity || '27,500 km/h', 
-                alt: sat.alt || sat.satalt || '400 km',
+                estado: sat.status || sat.estado || 'ACTIVO',
+                speed: sat.velocity || sat.speed || '27,500 km/h', 
+                alt: sat.altitude || sat.alt || '400 km',
                 color: '#4ade80'
             }));
             
@@ -152,6 +153,7 @@ function Mapa() {
                 )}
             </div>
         </div>
+        
     );
 }
 
