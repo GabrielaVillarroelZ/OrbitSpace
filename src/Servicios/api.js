@@ -37,7 +37,12 @@ export const obtenerLanzamientos = async () => {
   try {
     const respuesta = await fetch("https://orbitspace-backend.onrender.com/launches");
     if (!respuesta.ok) return [];
-    return await respuesta.json();
+    const datos = await respuesta.json();
+
+    // 🔥 LOG DE PRUEBA PARA DAVID:
+    console.log("🚀 LANZAMIENTOS (David):", datos);
+    
+    return datos;
   } catch (error) {
     return [];
   }
@@ -52,7 +57,12 @@ export const obtenerFavoritos = async () => {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!respuesta.ok) return [];
-    return await respuesta.json();
+    const datos = await respuesta.json();
+
+    // 🔥 LOG DE PRUEBA PARA ÁNGELA:
+    console.log("💖 FAVORITOS (Ángela):", datos);
+
+    return datos;
   } catch (error) {
     return [];
   }
