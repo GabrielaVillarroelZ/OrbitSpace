@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "./OrbitSpace-Logo.svg"; 
 import { AlertCircle } from "lucide-react";
+// Importamos nuestras super alertas
+import { AlertaEspacial, ToastEspacial } from "../Servicios/alertas"; 
 
 function Login({ onClose }) {
     const [vista, setVista] = useState("Login");
@@ -53,31 +55,56 @@ function Login({ onClose }) {
                     body: JSON.stringify({ email: formData.email, password: formData.password })
                 });
 
-                if (!respuesta.ok) throw new Error("Credenciales inválidas");
+                if (!respuesta.ok) {
+                     // Disparamos la alerta de SweetAlert2 en lugar de setErrores
+                     AlertaEspacial.fire({
+                        icon: 'error',
+                        title: 'Acceso Denegado',
+                        text: 'Credenciales incorrectas. Revisa tu identificación orbital.'
+                    });
+                    return; // Detenemos la ejecución aquí
+                }
 
                 const datos = await respuesta.json();
                 
                 localStorage.setItem('orbitToken', datos.token);
                 localStorage.setItem('orbitspace_auth', 'true');
                 
+                let nombreFinal = "";
                 if (datos.user || datos.usuario) {
-                    localStorage.setItem('orbitUser', JSON.stringify(datos.user || datos.usuario));
+                    const userObj = datos.user || datos.usuario;
+                    localStorage.setItem('orbitUser', JSON.stringify(userObj));
+                    nombreFinal = userObj.nombre || "Comandante";
                 } else {
                     const nombreExtraido = formData.email.split('@')[0];
                     const nombreFormateado = nombreExtraido.charAt(0).toUpperCase() + nombreExtraido.slice(1);
-                    
                     localStorage.setItem('orbitUser', JSON.stringify({ 
                         nombre: nombreFormateado, 
                         email: formData.email 
                     }));
+                    nombreFinal = nombreFormateado;
                 }
                 
-                if (onClose) onClose();
-                navigate("/dashboard");
-                window.location.reload();
+                // Si el login es un éxito, disparamos el Toast
+                ToastEspacial.fire({
+                    icon: 'success',
+                    title: `Bienvenida a bordo, ${nombreFinal}`
+                });
+
+                // Damos 1.5 segundos para que se vea el toast antes de viajar al dashboard
+                setTimeout(() => {
+                    if (onClose) onClose();
+                    navigate("/dashboard");
+                    window.location.reload(); 
+                }, 1500);
 
             } catch (error) {
-                setErrores({ email: "Credenciales denegadas por el servidor central." });
+                // Error de servidor (500) o sin internet
+                AlertaEspacial.fire({
+                    icon: 'warning',
+                    title: 'Fallo de Conexión',
+                    text: 'No se pudo contactar con el servidor central.'
+                });
             }
         } else if (vista === "registro") {
             try {
@@ -91,24 +118,55 @@ function Login({ onClose }) {
                     })
                 });
 
-                if (!respuesta.ok) throw new Error("Fallo en el registro");
+                if (!respuesta.ok) {
+                     AlertaEspacial.fire({
+                        icon: 'error',
+                        title: 'Fallo en Registro',
+                        text: 'Quizás el correo ya esté en uso o la señal se perdió.'
+                    });
+                    return;
+                }
 
                 const datos = await respuesta.json();
 
                 if (datos.token) {
                     localStorage.setItem('orbitToken', datos.token);
                     localStorage.setItem('orbitspace_auth', 'true');
-                    if (onClose) onClose();
-                    navigate("/dashboard");
+                    
+                    ToastEspacial.fire({
+                        icon: 'success',
+                        title: `Recluta registrada con éxito.`
+                    });
+
+                    setTimeout(() => {
+                        if (onClose) onClose();
+                        navigate("/dashboard");
+                        window.location.reload();
+                    }, 1500);
                 } else {
-                    alert("¡Recluta aceptado! Por favor, inicia sesión con tus nuevas credenciales.");
-                    cambiarVista("Login");
+                    // Si el backend no da token al registrarse, pedimos login manual
+                    AlertaEspacial.fire({
+                        icon: 'success',
+                        title: '¡Recluta Aceptado!',
+                        text: 'Por favor, inicia sesión con tus nuevas credenciales.'
+                    }).then(() => {
+                        cambiarVista("Login");
+                    });
                 }
 
             } catch (error) {
-                setErrores({ email: "Error de comunicación. Quizás el correo ya esté en uso." });
+                AlertaEspacial.fire({
+                    icon: 'warning',
+                    title: 'Error de Comunicación',
+                    text: 'No se pudo contactar con los servidores de la academia.'
+                });
             }
         } else if (vista === "recuperar") {
+            // Simulamos el envío del correo con un Toast
+            ToastEspacial.fire({
+                icon: 'info',
+                title: 'Instrucciones enviadas a tu canal seguro.'
+            });
             cambiarVista("Login");
         }
     };
@@ -120,7 +178,7 @@ function Login({ onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm p-4 font-sans">
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm p-4 font-sans">
             <div className="mb-8 z-10 flex items-center gap-2">
                 <img src={logo} alt="OrbitSpace Logo" className="w-64 h-auto object-contain drop-shadow-[0_0_15px_rgba(168,85,246,0.5)]" />
             </div>

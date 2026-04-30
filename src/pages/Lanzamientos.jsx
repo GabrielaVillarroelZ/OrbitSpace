@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Rocket, Calendar, MapPin, Loader2, Navigation, X, Globe, Activity, Zap, Box } from "lucide-react";
 import { obtenerLanzamientos } from '../Servicios/api';
+import { AlertaEspacial } from '../Servicios/alertas';
 
 const GlobalStyles = () => (
   <style>{`
@@ -21,6 +22,8 @@ function Lanzamientos() {
   const [misiones, setMisiones] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [misionSeleccionada, setMisionSeleccionada] = useState(null);
+  
+  // 👉 ¡AQUÍ ESTÁ LA LÍNEA QUE FALTABA!
   const starsArray = Array.from({ length: 40 });
 
   useEffect(() => {
@@ -30,7 +33,11 @@ function Lanzamientos() {
         if (datos && datos.data) setMisiones(datos.data);
         else if (Array.isArray(datos)) setMisiones(datos);
       } catch (error) {
-        console.error(error);
+        AlertaEspacial.fire({
+          icon: 'error',
+          title: 'Error de Telemetría',
+          text: 'Imposible sincronizar el calendario de lanzamientos. El servidor ha devuelto un error (500).'
+        });
       } finally {
         setCargando(false);
       }
@@ -45,7 +52,6 @@ function Lanzamientos() {
     } catch (e) { return "Próximamente"; }
   };
 
-  // Función inteligente para el color del estado leyendo "status"
   const obtenerEstiloEstado = (mision) => {
     const estadoStr = (mision.status || mision.estado || "").toLowerCase();
     
@@ -128,7 +134,6 @@ function Lanzamientos() {
         )}
       </div>
 
-      {/* --- MODAL DETALLADO --- */}
       {misionSeleccionada && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#05010a]/90 backdrop-blur-md animate-in fade-in">
           <div className="relative w-full max-w-2xl bg-[#0a0515] border border-purple-500/30 rounded-[40px] shadow-2xl overflow-hidden animate-modal-in flex flex-col max-h-[90vh]">

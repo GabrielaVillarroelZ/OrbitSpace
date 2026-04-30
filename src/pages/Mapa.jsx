@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Globe from 'react-globe.gl';
 import { Heart, X, Info, Radio, Zap } from 'lucide-react';
 import { obtenerSatelites, obtenerFavoritos, toggleFavorito } from '../Servicios/api'; 
+import { ToastEspacial } from '../Servicios/alertas'; 
 
 const GlobalStyles = () => (
   <style>{`
@@ -71,8 +72,30 @@ function Mapa() {
     }, []);
 
     const handleToggleFavorite = async (sat) => {
+        const yaEraFavorito = isFav(sat.id);
+        
         const exito = await toggleFavorito(sat.id);
-        if (exito) await cargarFavs();
+        if (exito) {
+            await cargarFavs(); 
+            
+            if (yaEraFavorito) {
+                ToastEspacial.fire({
+                    icon: 'info',
+                    title: 'Satélite desanclado del radar'
+                });
+            } else {
+                ToastEspacial.fire({
+                    icon: 'success',
+                    title: '¡Satélite fijado en el radar!'
+                });
+            }
+        } else {
+            ToastEspacial.fire({
+                icon: 'error',
+                title: 'Fallo de anclaje',
+                text: 'Revisa tu conexión satelital.'
+            });
+        }
     };
 
     return (
@@ -136,7 +159,7 @@ function Mapa() {
                                 <span className="text-xs font-mono text-white">{selectedSat.lat.toFixed(2)}, {selectedSat.lng.toFixed(2)}</span>
                             </div>
                         </div>
-                        <button onClick={() => handleToggleFavorite(selectedSat)} className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${isFav(selectedSat.id) ? 'bg-fuchsia-600 text-white' : 'bg-white/10 text-purple-200 border border-white/10'}`}>
+                        <button onClick={() => handleToggleFavorite(selectedSat)} className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${isFav(selectedSat.id) ? 'bg-fuchsia-600 text-white shadow-[0_0_20px_rgba(217,70,239,0.4)]' : 'bg-white/10 text-purple-200 border border-white/10 hover:bg-white/20'}`}>
                             <Heart size={20} fill={isFav(selectedSat.id) ? "white" : "none"} />
                             {isFav(selectedSat.id) ? 'En Favoritos' : 'Seguir Satélite'}
                         </button>
