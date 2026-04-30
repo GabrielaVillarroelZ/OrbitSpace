@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Star, Satellite, Orbit, Activity, Map, Eye, Loader2, Trash2 } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { obtenerFavoritos, toggleFavorito } from '../Servicios/api';
+// Importamos nuestras alertas espaciales
+import { AlertaEspacial, ToastEspacial } from '../Servicios/alertas';
 
 const GlobalStyles = () => (
   <style>{`
@@ -31,11 +33,35 @@ function Favoritos() {
 
   useEffect(() => { cargarDatos(); }, []);
 
-  const eliminarFavorito = async (id) => {
-    if (window.confirm("¿Interrumpir seguimiento?")) {
-      const exito = await toggleFavorito(id);
-      if (exito) cargarDatos();
-    }
+  const eliminarFavorito = (id, nombreSat) => {
+    // Reemplazamos window.confirm por nuestra AlertaEspacial
+    AlertaEspacial.fire({
+      title: '¿Interrumpir seguimiento?',
+      html: `Se detendrá la telemetría continua de <br/><b class="text-fuchsia-400">${nombreSat}</b>.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, detener',
+      cancelButtonText: 'Mantener'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const exito = await toggleFavorito(id);
+        if (exito) {
+          cargarDatos(); // Refrescamos la lista
+          // Mostramos el Toast de confirmación
+          ToastEspacial.fire({
+            icon: 'info',
+            title: 'Satélite eliminado de la red.'
+          });
+        } else {
+          // Si algo falla al borrar
+          ToastEspacial.fire({
+            icon: 'error',
+            title: 'Fallo al desanclar',
+            text: 'Revisa tu conexión satelital.'
+          });
+        }
+      }
+    });
   };
 
   return (
@@ -82,12 +108,14 @@ function Favoritos() {
               const id = item.id || item.vehiculo_id;
               const latRaw = item.latitud || item.lat || item.latitude || 0;
               const lngRaw = item.longitud || item.lng || item.longitude || 0;
+              // Guardamos el nombre para usarlo en la alerta
+              const nombreSat = item.name || item.nombre_vehiculo || item.nombre || `SAT-${id}`;
 
               return (
                 <div key={id} className="bg-[#1a0b36]/70 backdrop-blur-md border border-purple-500/20 p-5 rounded-3xl hover:border-fuchsia-400/40 transition-all group flex gap-5">
                   <div className="w-20 h-20 bg-purple-900/40 rounded-2xl flex items-center justify-center border border-purple-500/10"><Satellite className="text-purple-400 group-hover:text-fuchsia-400" size={32} /></div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-bold truncate text-white group-hover:text-fuchsia-300 transition-colors">{item.name || item.nombre_vehiculo || item.nombre || `SAT-${id}`}</h3>
+                    <h3 className="text-lg font-bold truncate text-white group-hover:text-fuchsia-300 transition-colors">{nombreSat}</h3>
                     <div className="grid grid-cols-2 gap-2 my-4">
                       <div className="bg-[#0a0515] p-2 rounded-xl border border-purple-500/10 flex items-center gap-2">
                         <Orbit size={14} className="text-fuchsia-500" />
@@ -100,7 +128,7 @@ function Favoritos() {
                     </div>
                     <div className="flex gap-2">
                       <Link to="/mapa" className="flex-1 py-2 bg-white/5 hover:bg-fuchsia-500/10 rounded-xl text-xs font-bold border border-white/5 flex items-center justify-center gap-2 transition-all"><Eye size={14} className="text-fuchsia-400" /> Rastrear</Link>
-                      <button onClick={() => eliminarFavorito(id)} className="p-2 bg-red-500/10 text-red-400 border border-red-500/10 hover:bg-red-500/20 rounded-xl transition-all"><Trash2 size={16} /></button>
+                      <button onClick={() => eliminarFavorito(id, nombreSat)} className="p-2 bg-red-500/10 text-red-400 border border-red-500/10 hover:bg-red-500/20 rounded-xl transition-all"><Trash2 size={16} /></button>
                     </div>
                   </div>
                 </div>
