@@ -23,7 +23,6 @@ function Lanzamientos() {
   const [cargando, setCargando] = useState(true);
   const [misionSeleccionada, setMisionSeleccionada] = useState(null);
   
-  // 👉 ¡AQUÍ ESTÁ LA LÍNEA QUE FALTABA!
   const starsArray = Array.from({ length: 40 });
 
   useEffect(() => {
@@ -56,13 +55,27 @@ function Lanzamientos() {
     const estadoStr = (mision.status || mision.estado || "").toLowerCase();
     
     if (estadoStr.includes("success") || estadoStr.includes("éxito")) return "bg-green-500/10 text-green-400 border-green-400/20";
-    if (estadoStr.includes("preparación") || estadoStr.includes("pendiente")) return "bg-yellow-500/10 text-yellow-400 border-yellow-400/20";
+    if (estadoStr.includes("preparación") || estadoStr.includes("pendiente") || estadoStr.includes("scheduled")) return "bg-yellow-500/10 text-yellow-400 border-yellow-400/20";
     
     return "bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-400/20";
   };
 
+  const traducirEstado = (estadoRaw) => {
+    if (!estadoRaw) return "";
+    const traducciones = {
+      "Success": "ÉXITO",
+      "Scheduled": "PROGRAMADO",
+      "TBD": "POR DETERMINAR",
+      "Failure": "FALLIDO",
+      "In Flight": "EN VUELO"
+    };
+    return traducciones[estadoRaw] || estadoRaw.toUpperCase();
+  };
+
   const obtenerTextoEstado = (mision) => {
-    return mision.status || mision.estado || (mision.date ? "Programado" : "Pendiente");
+    const estado = mision.status || mision.estado;
+    if (estado) return traducirEstado(estado);
+    return mision.date ? "PROGRAMADO" : "PENDIENTE";
   };
 
   return (

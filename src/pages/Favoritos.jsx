@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Star, Satellite, Orbit, Activity, Map, Eye, Loader2, Trash2 } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { obtenerFavoritos, toggleFavorito } from '../Servicios/api';
-// Importamos nuestras alertas espaciales
 import { AlertaEspacial, ToastEspacial } from '../Servicios/alertas';
 
 const GlobalStyles = () => (
@@ -34,7 +33,6 @@ function Favoritos() {
   useEffect(() => { cargarDatos(); }, []);
 
   const eliminarFavorito = (id, nombreSat) => {
-    // Reemplazamos window.confirm por nuestra AlertaEspacial
     AlertaEspacial.fire({
       title: '¿Interrumpir seguimiento?',
       html: `Se detendrá la telemetría continua de <br/><b class="text-fuchsia-400">${nombreSat}</b>.`,
@@ -46,14 +44,12 @@ function Favoritos() {
       if (result.isConfirmed) {
         const exito = await toggleFavorito(id);
         if (exito) {
-          cargarDatos(); // Refrescamos la lista
-          // Mostramos el Toast de confirmación
+          cargarDatos(); 
           ToastEspacial.fire({
             icon: 'info',
             title: 'Satélite eliminado de la red.'
           });
         } else {
-          // Si algo falla al borrar
           ToastEspacial.fire({
             icon: 'error',
             title: 'Fallo al desanclar',
@@ -108,7 +104,6 @@ function Favoritos() {
               const id = item.id || item.vehiculo_id;
               const latRaw = item.latitud || item.lat || item.latitude || 0;
               const lngRaw = item.longitud || item.lng || item.longitude || 0;
-              // Guardamos el nombre para usarlo en la alerta
               const nombreSat = item.name || item.nombre_vehiculo || item.nombre || `SAT-${id}`;
 
               return (

@@ -9,7 +9,6 @@ export const login = async (email, password) => {
     });
 
     if (!respuesta.ok) {
-      // Mejora: Alerta visual de error en lugar de solo fallar por consola
       AlertaEspacial.fire({
         icon: 'error',
         title: 'Acceso Denegado',
@@ -32,7 +31,6 @@ export const login = async (email, password) => {
       localStorage.setItem('orbitUser', JSON.stringify(userObj));
     }
 
-    // Mejora: Notificación sutil de bienvenida
     ToastEspacial.fire({
       icon: 'success',
       title: `Bienvenida a bordo, ${userObj.nombre}`
@@ -52,7 +50,6 @@ export const login = async (email, password) => {
 
 export const obtenerSatelites = async (lat, lng) => {
   try {
-    // Ruta correcta restaurada: /satellites/active
     const url = `https://orbitspace-backend.onrender.com/satellites/active?lat=${lat}&lng=${lng}`;
     const respuesta = await fetch(url);
     if (!respuesta.ok) return [];
@@ -67,10 +64,6 @@ export const obtenerLanzamientos = async () => {
     const respuesta = await fetch("https://orbitspace-backend.onrender.com/launches");
     if (!respuesta.ok) return [];
     const datos = await respuesta.json();
-
-    // 🔥 LOG DE PRUEBA PARA DAVID:
-    console.log("🚀 LANZAMIENTOS (David):", datos);
-    
     return datos;
   } catch (error) {
     return [];
@@ -87,10 +80,6 @@ export const obtenerFavoritos = async () => {
     });
     if (!respuesta.ok) return [];
     const datos = await respuesta.json();
-
-    // 🔥 LOG DE PRUEBA PARA ÁNGELA:
-    console.log("💖 FAVORITOS (Ángela):", datos);
-
     return datos;
   } catch (error) {
     return [];
@@ -112,13 +101,11 @@ export const toggleFavorito = async (vehiculoId) => {
 };
 
 export const obtenerDatosUsuario = () => {
-  // Función original, síncrona y a prueba de fallos (Evita el error 404 del perfil)
   const usuarioRaw = localStorage.getItem('orbitUser');
   return usuarioRaw ? JSON.parse(usuarioRaw) : { nombre: "Comandante", email: "desconocido@orbit.space" };
 };
 
 export const cerrarSesion = () => {
-  // Mejora: Alerta de confirmación antes de borrar los datos
   AlertaEspacial.fire({
     title: '¿Desconectar terminal?',
     text: "Se cerrará la conexión segura con OrbitSpace.",
@@ -141,7 +128,7 @@ export const enviarMensajeChat = async (mensaje) => {
     const token = localStorage.getItem('orbitToken');
     if (!token) throw new Error("No hay sesión activa");
     
-    // Ruta correcta restaurada: /ai/chat
+
     const respuesta = await fetch("https://orbitspace-backend.onrender.com/ai/chat", {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
