@@ -170,7 +170,7 @@ function Lanzamientos() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 <div className="bg-purple-500/5 p-4 rounded-3xl border border-purple-500/10">
                   <Calendar size={18} className="text-fuchsia-400 mb-2" />
-                  <p className="text-[10px] text-purple-400 uppercase font-black">Fecha NET</p>
+                  <p className="text-[10px] text-purple-400 uppercase font-black">Fecha</p>
                   <p className="text-xs text-white font-mono">{formatearFecha(misionSeleccionada.date)}</p>
                 </div>
                 <div className="bg-purple-500/5 p-4 rounded-3xl border border-purple-500/10">
