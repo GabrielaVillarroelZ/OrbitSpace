@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LoaderOrbital from '../components/LoaderOrbital';
 import { Satellite, Rocket, Activity, CheckCircle2, AlertTriangle, Wifi, Search, MapPin, ShieldCheck } from 'lucide-react';
 import { obtenerSatelites, obtenerLanzamientos } from '../Servicios/api';
@@ -20,6 +21,7 @@ const GlobalStyles = () => (
 );
 
 function Dashboard() {
+  const navigate = useNavigate();
   const [cargando, setCargando] = useState(true);
   const [satelites, setSatelites] = useState([]);
   const [lanzamientos, setLanzamientos] = useState([]);
@@ -227,7 +229,11 @@ function Dashboard() {
             <h3 className="text-sm font-black mb-4 flex items-center gap-2 shrink-0 uppercase tracking-widest text-fuchsia-500"><Wifi size={18} />Enlace Directo</h3>
             <div className="space-y-3 overflow-y-auto pr-2 telemetria-scroll flex-1">
               {satelites.slice(0, 10).map((sat, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5 hover:border-fuchsia-500/20 transition-all">
+                <div 
+                  key={i} 
+                  onClick={() => navigate('/Mapa', { state: { sateliteFoco: sat } })}
+                  className="flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5 hover:border-fuchsia-500/20 hover:bg-white/10 cursor-pointer transition-all"
+                >
                     <div className="flex items-center gap-3">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]"></div>
                     <div>

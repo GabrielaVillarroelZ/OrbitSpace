@@ -20,7 +20,6 @@ function Favoritos() {
     try {
       const datos = await obtenerFavoritos();
       if (Array.isArray(datos)) {
-        console.log("Datos recibidos de favoritos:", datos);
         setFavoritos(datos);
       }
     } catch (error) {
@@ -122,7 +121,7 @@ function Favoritos() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Link to="/mapa" className="flex-1 py-2 bg-white/5 hover:bg-fuchsia-500/10 rounded-xl text-xs font-bold border border-white/5 flex items-center justify-center gap-2 transition-all"><Eye size={14} className="text-fuchsia-400" /> Rastrear</Link>
+                      <Link to="/mapa" state={{ sateliteFoco: item }} className="flex-1 py-2 bg-white/5 hover:bg-fuchsia-500/10 rounded-xl text-xs font-bold border border-white/5 flex items-center justify-center gap-2 transition-all"><Eye size={14} className="text-fuchsia-400" /> Rastrear</Link>
                       <button onClick={() => eliminarFavorito(id, nombreSat)} className="p-2 bg-red-500/10 text-red-400 border border-red-500/10 hover:bg-red-500/20 rounded-xl transition-all"><Trash2 size={16} /></button>
                     </div>
                   </div>

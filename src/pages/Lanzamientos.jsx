@@ -51,13 +51,14 @@ function Lanzamientos() {
     } catch (e) { return "Próximamente"; }
   };
 
-  const obtenerEstiloEstado = (mision) => {
-    const estadoStr = (mision.status || mision.estado || "").toLowerCase();
-    
-    if (estadoStr.includes("success") || estadoStr.includes("éxito")) return "bg-green-500/10 text-green-400 border-green-400/20";
-    if (estadoStr.includes("preparación") || estadoStr.includes("pendiente") || estadoStr.includes("scheduled")) return "bg-yellow-500/10 text-yellow-400 border-yellow-400/20";
-    
-    return "bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-400/20";
+  // Función para comprobar si el reloj llegó a cero (Blindada para Safari)
+  const esFechaPasada = (fechaRaw) => {
+    if (!fechaRaw) return false;
+    // Sustituimos el espacio por una 'T' para que Safari no colapse con el estándar ISO 8601
+    const fechaSegura = fechaRaw.replace(' ', 'T'); 
+    const fechaLanzamiento = new Date(fechaSegura);
+    const ahora = new Date();
+    return fechaLanzamiento < ahora;
   };
 
   const traducirEstado = (estadoRaw) => {
@@ -72,10 +73,42 @@ function Lanzamientos() {
     return traducciones[estadoRaw] || estadoRaw.toUpperCase();
   };
 
+  // Lógica inteligente de estado (El Parche Definitivo)
   const obtenerTextoEstado = (mision) => {
     const estado = mision.status || mision.estado;
+    const yaPaso = esFechaPasada(mision.date);
+    
+    // Normalizamos el estado a minúsculas para evitar fallos por mayúsculas o traducciones previas
+    const estadoLower = (estado || "").toLowerCase();
+
+    // 1. Si la BD tiene un estado DEFINITIVO (en inglés o español), lo respetamos siempre
+    if (
+      estadoLower.includes("success") || estadoLower.includes("éxito") || 
+      estadoLower.includes("failure") || estadoLower.includes("fallido") || 
+      estadoLower.includes("in flight") || estadoLower.includes("en vuelo")
+    ) {
+      return traducirEstado(estado);
+    }
+
+    // 2. EL PARCHE: Si ya pasó la fecha y NO tiene un estado definitivo de los de arriba...
+    if (yaPaso) {
+      return "VERIFICANDO DATOS";
+    }
+
+    // 3. Comportamiento normal para misiones futuras
     if (estado) return traducirEstado(estado);
     return mision.date ? "PROGRAMADO" : "PENDIENTE";
+  };
+
+  // Estilos vinculados al texto renderizado
+  const obtenerEstiloEstado = (mision) => {
+    const textoMostrado = obtenerTextoEstado(mision).toLowerCase();
+    
+    if (textoMostrado.includes("éxito")) return "bg-green-500/10 text-green-400 border-green-400/20";
+    if (textoMostrado.includes("fallido")) return "bg-red-500/10 text-red-400 border-red-400/20";
+    if (textoMostrado.includes("verificando") || textoMostrado.includes("programado") || textoMostrado.includes("pendiente")) return "bg-yellow-500/10 text-yellow-400 border-yellow-400/20";
+    
+    return "bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-400/20";
   };
 
   return (

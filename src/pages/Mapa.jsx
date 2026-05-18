@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import Globe from 'react-globe.gl';
-import { Heart, X, Info, Radio, Zap } from 'lucide-react';
+import { Heart, X, Info, Zap } from 'lucide-react';
 import { obtenerSatelites, obtenerFavoritos, toggleFavorito } from '../Servicios/api'; 
 import { ToastEspacial } from '../Servicios/alertas'; 
 
@@ -15,6 +16,7 @@ const GlobalStyles = () => (
 
 function Mapa() {
     const globeEl = useRef();
+    const location = useLocation();
     const [selectedSat, setSelectedSat] = useState(null);
     const [satellites, setSatellites] = useState([]);
     const [favoritos, setFavoritos] = useState([]);
@@ -61,40 +63,56 @@ function Mapa() {
     }, []);
 
     useEffect(() => {
+        const satFoco = location.state?.sateliteFoco;
+        
+        if (satFoco && globeEl.current) {
+            globeEl.current.controls().autoRotate = false;
+            
+            const targetLat = parseFloat(satFoco.lat || satFoco.latitud || 0);
+            const targetLng = parseFloat(satFoco.lng || satFoco.longitud || 0);
+            
+            globeEl.current.pointOfView({ lat: targetLat, lng: targetLng, altitude: 0.8 }, 1500);
+            
+            setSelectedSat({
+                id: satFoco.satid || satFoco.id || satFoco.vehiculo_id,
+                lat: targetLat,
+                lng: targetLng,
+                name: satFoco.name || satFoco.nombre || 'Objeto Orbital',
+                speed: satFoco.velocity || satFoco.speed || '27,500 km/h', 
+                alt: satFoco.altitude || satFoco.alt || '400 km'
+            });
+
+            ToastEspacial.fire({
+                icon: 'info',
+                title: 'Señal Fijada',
+                text: `Rastreando: ${satFoco.name || "UNNAMED-SAT"}`
+            });
+        }
+    }, [location.state, satellites.length]);
+
+    useEffect(() => {
         const timer = setTimeout(() => {
-            if (globeEl.current) {
+            if (globeEl.current && !location.state?.sateliteFoco) {
                 globeEl.current.controls().autoRotate = true;
-                globeEl.current.controls().autoRotateSpeed = 0.5;
+                globeEl.current.controls().autoRotateSpeed = 0.15; 
                 globeEl.current.pointOfView({ lat: 20, lng: 0, altitude: 2 });
             }
         }, 100);
         return () => clearTimeout(timer);
-    }, []);
+    }, [location.state]);
 
     const handleToggleFavorite = async (sat) => {
         const yaEraFavorito = isFav(sat.id);
-        
         const exito = await toggleFavorito(sat.id);
         if (exito) {
             await cargarFavs(); 
-            
             if (yaEraFavorito) {
-                ToastEspacial.fire({
-                    icon: 'info',
-                    title: 'Satélite desanclado del radar'
-                });
+                ToastEspacial.fire({ icon: 'info', title: 'Satélite desanclado del radar' });
             } else {
-                ToastEspacial.fire({
-                    icon: 'success',
-                    title: '¡Satélite fijado en el radar!'
-                });
+                ToastEspacial.fire({ icon: 'success', title: '¡Satélite fijado en el radar!' });
             }
         } else {
-            ToastEspacial.fire({
-                icon: 'error',
-                title: 'Fallo de anclaje',
-                text: 'Revisa tu conexión satelital.'
-            });
+            ToastEspacial.fire({ icon: 'error', title: 'Fallo de anclaje', text: 'Revisa tu conexión satelital.' });
         }
     };
 
@@ -135,7 +153,16 @@ function Mapa() {
                     pointRadius={0.7}
                     onPointClick={(point) => {
                         setSelectedSat(point);
+                        globeEl.current.controls().autoRotate = false;
                         globeEl.current.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1 }, 1000);
+                    }}
+                    onGlobeClick={() => {
+                        if (selectedSat) {
+                            setSelectedSat(null);
+                            globeEl.current.controls().autoRotateSpeed = 0.15;
+                            globeEl.current.controls().autoRotate = true; 
+                            globeEl.current.pointOfView({ altitude: 2 }, 1000); 
+                        }
                     }}
                     labelsData={satellites}
                     labelLat={d => d.lat}
@@ -147,7 +174,20 @@ function Mapa() {
 
                 {selectedSat && (
                     <div className="absolute top-6 right-6 w-80 bg-[#1a0b36]/90 backdrop-blur-xl border border-purple-500/40 rounded-3xl p-6 shadow-2xl z-50 animate-in fade-in slide-in-from-right-8">
-                        <button onClick={() => setSelectedSat(null)} className="absolute top-4 right-4 text-purple-300 hover:text-white"><X size={20} /></button>
+                        <button 
+                            onClick={() => {
+                                setSelectedSat(null);
+                                if (globeEl.current) {
+                                    globeEl.current.controls().autoRotateSpeed = 0.15;
+                                    globeEl.current.controls().autoRotate = true; 
+                                    globeEl.current.pointOfView({ altitude: 2 }, 1000); 
+                                }
+                            }} 
+                            className="absolute top-4 right-4 text-purple-300 hover:text-white transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+                        
                         <h3 className="font-bold text-xl text-white mb-6 truncate">{selectedSat.name}</h3>
                         <div className="space-y-4 mb-8">
                             <div className="flex justify-between items-center p-3 rounded-xl bg-white/5">
